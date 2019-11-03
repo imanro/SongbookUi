@@ -1,0 +1,13 @@
+<div class="page-layout simple fullwidth song-list">
+    <div class="content p-24">
+        <div *ngIf="isLoading" class="progress-bar-container">
+            <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'"></mat-progress-bar>
+        </div>
+
+        <sb-song-list [songs]="songs"
+                      [songsCount]="songsCount"
+                      [dataFilter]="songsListDataFilter"
+                      (filterChange)="handleSongsListFilterChange($event)"
+        ></sb-song-list>
+    </div>
+</div>

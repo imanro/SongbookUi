@@ -1,0 +1,29 @@
+<div class="filter-cont" [formGroup]="songSearchForm">
+    <mat-form-field appearance="standard">
+        <input matInput #filter placeholder="Search for songs" formControlName="filter" autocomplete="off">
+    </mat-form-field>
+</div>
+
+<div class="mat-elevation-z8">
+    <mat-table [dataSource]="songs">
+        <!-- Position Column -->
+        <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef fxFlex="0 0 100px"> Id </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="0 0 100px"> {{item.id}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
+            <mat-cell *matCellDef="let item"> {{item.title}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" ></mat-row>
+    </mat-table>
+    <mat-paginator [length]="songsCount"
+                   [pageSize]="dataFilter.limit"
+                   [pageIndex]="dataFilter.getPage(true)"
+                   [hidePageSize]="true"
+                   (page)="handlePageChange($event)"
+    ></mat-paginator>
+</div>
