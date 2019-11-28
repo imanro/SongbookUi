@@ -8,4 +8,6 @@ import {ApiResult} from '../models/api-result.model';
 @Injectable()
 export abstract class SbSongRepository extends SbBaseRepository {
     abstract findSongs(filter: AppDataFilter): Observable<ApiResult<SbSong>>;
+
+    abstract findSong(id): Observable<SbSong>;
 }

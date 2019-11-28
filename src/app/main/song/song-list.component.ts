@@ -25,6 +25,9 @@ export class SongListComponent implements OnInit {
     @Output()
     filterChange = new EventEmitter<AppDataFilter>();
 
+    @Output()
+    songSelect = new EventEmitter<SbSong>();
+
     @ViewChild('filter', {static: false}) filter: ElementRef;
 
     displayedColumns = ['id', 'title'];
@@ -48,6 +51,10 @@ export class SongListComponent implements OnInit {
         this.dataFilter.offset = page.pageIndex > 0 ? page.pageIndex * page.pageSize : 0;
         this.dataFilter.limit = page.pageSize;
         this.filterChange.next(this.dataFilter);
+    }
+
+    handleSongSelect(song: SbSong): void {
+        this.songSelect.next(song);
     }
 
     private buildSongSearchForm(): void {

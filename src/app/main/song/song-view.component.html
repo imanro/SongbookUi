@@ -1,0 +1,14 @@
+<div class="px-16">
+    <h2 class="mb-24 mt-0">{{song.title}}</h2>
+
+    <div class="alt-headers secondary-text mb-32">{{getHeadersString()}}</div>
+
+<!--    to show here: -->
+
+<!--    other titles, content items (video, texts etc.), tags, [amount of performances, calendar with performances] -->
+<!--    [matching with another songs (often taken before/after)] -->
+<!--    form for adding content, [input for tags] -->
+    <mat-chip-list>
+        <mat-chip *ngFor="let tag of song.tags">{{tag.title}}</mat-chip>
+    </mat-chip-list>
+</div>

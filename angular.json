@@ -72,10 +72,11 @@
                     }
                 },
                 "serve": {
+                    // "builder": "@angular-builders/custom-webpack:dev-server",
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "options": {
                         "browserTarget": "fuse:build",
-			"port": 4210
+                        "port": 4210
                     },
                     "configurations": {
                         "production": {

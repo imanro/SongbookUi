@@ -1,14 +1,22 @@
 import {SbSong} from '../models/song.model';
+import {mockContent, mockHeaders} from './mock-content';
+import {mockTags} from './mock-tags';
+// generate mock-content, mock-headers and mock-tags to use with several songs
 
 
 const songData = [
     {
         id: 1,
-        title: 'Thank You, Lord'
+        title: 'Thank You, Lord',
+        headers: mockHeaders,
+        content: mockContent,
+        tags: mockTags
     },
     {
         id: 2,
-        title: 'Every Praise'
+        title: 'Every Praise',
+        headers: mockHeaders,
+        content: mockContent
     },
     {
         id: 3,

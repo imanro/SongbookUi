@@ -1,12 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {AppConfig, IAppConfig} from '../../app.config';
+import {BehaviorSubject, Subject, combineLatest as observableCombineLatest, Observable} from 'rxjs';
 import {SongViewEnum} from '../../shared/enums/song.view.enum';
 import {SbSongRepository} from '../../shared/repositories/song.repository';
 import {SbSong} from '../../shared/models/song.model';
 import {AppDataFilter} from '../../shared/models/data-filter.model';
+import {Location} from '@angular/common';
+import {ActivatedRoute} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import * as _ from 'lodash';
-import {Observable} from 'rxjs';
 
 @Component({
     selector: 'sb-song-container',
@@ -15,11 +17,13 @@ import {Observable} from 'rxjs';
 })
 export class SongContainerComponent implements OnInit {
 
+    view: string;
+
     songs: SbSong[];
 
     songsCount: number;
 
-    view: string;
+    currentSong: SbSong;
 
     viewNameEnum: any;
 
@@ -29,9 +33,13 @@ export class SongContainerComponent implements OnInit {
 
     isLoading = false;
 
+    isToolbarShown = false;
+
     constructor(
         private appConfig: AppConfig,
+        private location: Location,
         private songRepository: SbSongRepository,
+        private activatedRoute: ActivatedRoute
     ) {
         this.viewNameEnum = SongViewEnum;
     }
@@ -40,8 +48,8 @@ export class SongContainerComponent implements OnInit {
         this.view = SongViewEnum.SONG_LIST;
         this.setSongsListDataFilter(this.createDataFilter());
         this.fetchSongs().subscribe(() => {});
+        this.processRoute();
     }
-
 
     handleSongsListFilterChange(dataFilter: AppDataFilter): void {
         const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
@@ -61,6 +69,38 @@ export class SongContainerComponent implements OnInit {
             .subscribe(() => {
                 }
             );
+    }
+
+    handleSongSelect(song?: SbSong): void {
+
+        if (song && song.id) {
+
+            this.currentSong = song;
+            console.log('Replace state!!!!');
+            this.location.replaceState('/song/' + song.id);
+            // get full version of song with content etc
+            this.viewSong(song.id);
+
+        } else {
+            this.view = SongViewEnum.SONG_LIST;
+        }
+    }
+
+    handleNavigateBack(): void {
+        this.view = SongViewEnum.SONG_LIST;
+        this.isToolbarShown = false;
+        this.location.replaceState('/song');
+    }
+
+    private viewSong(id: number): void {
+        this.songRepository.findSong(id).subscribe(fullSong => {
+            console.log('Obtained full version of song:', fullSong);
+            this.currentSong = fullSong;
+        });
+        this.view = SongViewEnum.SONG_VIEW;
+        this.isToolbarShown = true;
+        console.log('Repl state,,,,,,,,', id);
+        this.location.replaceState('/song/' + id);
     }
 
     private setSongsListDataFilter(dataFilter: AppDataFilter): void {
@@ -100,5 +140,17 @@ export class SongContainerComponent implements OnInit {
         return dataFilter;
     }
 
+    private processRoute(): void {
+        observableCombineLatest([this.activatedRoute.url, this.activatedRoute.params])
+            .subscribe(results => {
+                const segments = results[0];
+                const params = results[1];
 
+                if (params['songId']) {
+                    this.viewSong(parseInt(params['songId']));
+                }
+
+                console.log('Received result', params);
+            });
+    }
 }

@@ -4,10 +4,24 @@
             <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'"></mat-progress-bar>
         </div>
 
-        <sb-song-list [songs]="songs"
-                      [songsCount]="songsCount"
-                      [dataFilter]="songsListDataFilter"
-                      (filterChange)="handleSongsListFilterChange($event)"
-        ></sb-song-list>
+        <div class="mat-card mat-elevation-z4">
+            <div class="toolbar p-12" *ngIf="isToolbarShown">
+                <button class="mat-button mat-icon-button">
+                    <mat-icon class="secondary-text" aria-hidden="false" aria-label="Example home icon" (click)="handleNavigateBack()">arrow_back</mat-icon>
+                </button>
+            </div>
+            <sb-song-list [songs]="songs"
+                          [songsCount]="songsCount"
+                          [dataFilter]="songsListDataFilter"
+                          (filterChange)="handleSongsListFilterChange($event)"
+                          (songSelect)="handleSongSelect($event)"
+                          *ngIf="view === viewNameEnum.SONG_LIST"
+            ></sb-song-list>
+
+            <sb-song-view
+                [song]="currentSong"
+                *ngIf="view === viewNameEnum.SONG_VIEW"
+            ></sb-song-view>
+        </div>
     </div>
 </div>

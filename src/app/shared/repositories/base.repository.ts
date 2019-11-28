@@ -24,6 +24,10 @@ export abstract class SbBaseRepository {
         }
     }
 
+    getItemFromMockDataById(data: Array<any>, id): any {
+        return data.find(item => item.id === id);
+    }
+
     searchInMockDataByFilter(data: Array<any>, filter: AppDataFilter): Array<any> {
         console.log('Processing filter:', filter);
         if (typeof filter.where !== 'undefined' && typeof filter.where.search !== 'undefined' &&  filter.where.search.length > 0){
