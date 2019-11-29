@@ -8,7 +8,7 @@ import {
     MatInputModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatTableModule, MatIconModule
+    MatTableModule, MatIconModule, MatAutocompleteModule
 } from '@angular/material';
 import {FuseSharedModule} from '../../../@fuse/shared.module';
 import { SongViewComponent } from './song-view.component';
@@ -21,6 +21,7 @@ import { SongViewComponent } from './song-view.component';
     ],
     imports     : [
         FuseSharedModule,
+        MatAutocompleteModule,
         MatIconModule,
         MatProgressBarModule,
         MatTableModule,

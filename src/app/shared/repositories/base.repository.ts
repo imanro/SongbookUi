@@ -14,12 +14,15 @@ export abstract class SbBaseRepository {
         console.log('The filter?:', filter);
 
         if (typeof filter.limit !== undefined && filter.limit > 0){
-            if (typeof(filter.offset !== undefined && filter.offset > 0)) {
+            console.log('There is limit', filter.limit);
+            if (filter.offset !== undefined && filter.offset > 0) {
+                console.log('There is the offset', filter.offset);
                 return data.slice(filter.offset, filter.offset + filter.limit);
             } else {
                 return data.slice(0, filter.limit);
             }
         } else {
+            console.log('nc');
             return data;
         }
     }
@@ -34,6 +37,7 @@ export abstract class SbBaseRepository {
             console.log('to search the string: ', filter.where.search);
             return this.searchMockData(data, filter.where.search, ['title']);
         } else {
+            console.log('Return untouched data', data);
             return data;
         }
     }

@@ -7,7 +7,9 @@ import {ApiResult} from '../models/api-result.model';
 import {SbSong} from '../models/song.model';
 
 import {mockSongs} from '../data/mock-songs';
+import {mockTags} from '../data/mock-tags';
 import {SbSongRepository} from './song.repository';
+import {SbTag} from '../models/tag.model';
 
 @Injectable()
 export class SbSongMockRepository extends SbSongRepository {
@@ -39,7 +41,6 @@ export class SbSongMockRepository extends SbSongRepository {
         }).pipe(
             delay(d)
         );
-
     }
 
     findSong(id): Observable<SbSong> {
@@ -54,6 +55,30 @@ export class SbSongMockRepository extends SbSongRepository {
                 observer.next(item);
             }
 
+            observer.complete();
+        }).pipe(
+            delay(d)
+        );
+    }
+
+    findTags(filter: AppDataFilter): Observable<ApiResult<SbTag>> {
+        const d = this.appConfig.mockDelayMs;
+
+        return new Observable<ApiResult<SbTag>>(observer => {
+            const result = new ApiResult<SbTag>();
+
+            let rows = mockTags;
+            console.log('mock tags', rows);
+            rows = this.searchInMockDataByFilter(rows, filter);
+
+            result.totalCount = rows.length;
+            rows = this.sliceMockDataByFilter(rows, filter);
+
+            console.log(rows, 'tags sliced');
+
+            result.rows = rows;
+
+            observer.next(result);
             observer.complete();
         }).pipe(
             delay(d)

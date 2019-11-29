@@ -3,6 +3,8 @@ import {mockContent, mockHeaders} from './mock-content';
 import {mockTags} from './mock-tags';
 // generate mock-content, mock-headers and mock-tags to use with several songs
 
+const tagsSlice1 = mockTags.slice(0, 2).sort(() => Math.random() - 0.5);
+const tagsSlice2 = mockTags.slice(1, 3).sort(() => Math.random() - 0.5);
 
 const songData = [
     {
@@ -10,13 +12,14 @@ const songData = [
         title: 'Thank You, Lord',
         headers: mockHeaders,
         content: mockContent,
-        tags: mockTags
+        tags: tagsSlice1
     },
     {
         id: 2,
         title: 'Every Praise',
         headers: mockHeaders,
-        content: mockContent
+        content: mockContent,
+        tags: tagsSlice2
     },
     {
         id: 3,
