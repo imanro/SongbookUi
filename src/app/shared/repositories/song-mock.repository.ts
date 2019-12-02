@@ -27,7 +27,7 @@ export class SbSongMockRepository extends SbSongRepository {
             const result = new ApiResult<SbSong>();
 
             let rows = mockSongs;
-            rows = this.searchInMockDataByFilter(rows, filter);
+            rows = this.filterMockDataByFilter(rows, filter);
 
             result.totalCount = rows.length;
             rows = this.sliceMockDataByFilter(rows, filter);
@@ -61,6 +61,7 @@ export class SbSongMockRepository extends SbSongRepository {
         );
     }
 
+    // Todo: move to tagRepostiory
     findTags(filter: AppDataFilter): Observable<ApiResult<SbTag>> {
         const d = this.appConfig.mockDelayMs;
 
@@ -69,7 +70,7 @@ export class SbSongMockRepository extends SbSongRepository {
 
             let rows = mockTags;
             console.log('mock tags', rows);
-            rows = this.searchInMockDataByFilter(rows, filter);
+            rows = this.filterMockDataByFilter(rows, filter);
 
             result.totalCount = rows.length;
             rows = this.sliceMockDataByFilter(rows, filter);
@@ -80,6 +81,59 @@ export class SbSongMockRepository extends SbSongRepository {
 
             observer.next(result);
             observer.complete();
+        }).pipe(
+            delay(d)
+        );
+    }
+
+    attachTagToSong(tag: SbTag, song: SbSong): Observable<SbSong> {
+        const d = this.appConfig.mockDelayMs;
+
+        return new Observable<SbSong>(observer => {
+
+            if (!song.tags) {
+                song.tags = [];
+            }
+
+            song.tags.push(tag);
+            observer.next(song);
+            observer.complete();
+
+        }).pipe(
+            delay(d)
+        );
+    }
+
+    detachTagFromSong(tag: SbTag, song: SbSong): Observable<SbSong> {
+        const d = this.appConfig.mockDelayMs;
+
+        return new Observable<SbSong>(observer => {
+
+            if (!song.tags) {
+                song.tags = [];
+                observer.next(song);
+                observer.complete();
+            }
+
+            let foundIndex = null;
+            for (const index in song.tags) {
+                if (song.tags.hasOwnProperty(index)) {
+                    const sTag = song.tags[index];
+
+                    if (sTag.id === tag.id) {
+                        foundIndex = index;
+                    }
+                }
+            }
+
+            if (foundIndex !== null) {
+                song.tags.splice(foundIndex, 1);
+            }
+
+
+            observer.next(song);
+            observer.complete();
+
         }).pipe(
             delay(d)
         );

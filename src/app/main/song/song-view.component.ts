@@ -5,6 +5,10 @@ import {SbTag} from '../../shared/models/tag.model';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {AppDataFilter} from '../../shared/models/data-filter.model';
+import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../../shared/models/data-filter-where.model';
+import {SbSongRepository} from '../../shared/repositories/song.repository';
+import {MatAutocompleteSelectedEvent} from '@angular/material';
 
 @Component({
   selector: 'sb-song-view',
@@ -19,7 +23,13 @@ export class SongViewComponent implements OnInit, OnDestroy {
     @Input()
     foundTags: SbTag[];
 
-    @Output() tagSearch = new EventEmitter<string>();
+    @Output() tagSearch = new EventEmitter<AppDataFilter>();
+
+    @Output() tagAttach = new EventEmitter<SbTag>();
+
+    @Output() tagDetach = new EventEmitter<SbTag>();
+
+    @Output() tagCreate = new EventEmitter<string>();
 
     @ViewChild('tagInput', {static: false}) tagInput: ElementRef<HTMLInputElement>;
 
@@ -27,11 +37,14 @@ export class SongViewComponent implements OnInit, OnDestroy {
 
     tagCtrl = new FormControl();
 
-    private search$: Subject<string> = new Subject();
+    private search$: Subject<AppDataFilter> = new Subject();
 
     private unsubscribe$ = new Subject<void>();
 
+    private readonly keyEnter: string = 'Enter';
+
     constructor(
+        private songRepository: SbSongRepository
     ) {
     }
 
@@ -62,25 +75,42 @@ export class SongViewComponent implements OnInit, OnDestroy {
         console.log('Create tag', $chipEvent.value);
     }
 
-    handleTagAssign(tag: any): void {
-        console.log('Assign tag', tag);
+    handleTagAttach(tag: MatAutocompleteSelectedEvent): void {
+        this.tagAttach.next(tag.option.value);
+        console.log('Attach tag', );
     }
 
-    handleTagRemove(tag: SbTag): void {
-        console.log('Remove tag', tag);
+    handleTagDetach(tag: SbTag): void {
+        this.tagDetach.next(tag);
     }
 
-    handleTagSearch(): void {
-        const value = this.tagInput.nativeElement.value;
-        // right and simple way to search for tags
-        this.search$.next(value);
+    handleTagSearch(e: any): void {
+
+        if (e.key === this.keyEnter) {
+            console.log('Just do notning');
+
+        } else {
+
+            const value = this.tagInput.nativeElement.value;
+            // right and simple way to search for tags
+
+
+            if (this.song) {
+                const filter = this.songRepository.createDataFilter();
+                this.songRepository.buildTagSearchDataFilterBySong(filter, value, this.song);
+                this.search$.next(filter);
+
+            } else {
+                console.log('Song is null, not emitting the search');
+            }
+        }
     }
 
     private initSearch(): void {
         this.search$.pipe(
             debounceTime(300)
         ).subscribe(value => {
-            console.log('Emitting,', value);
+            console.log('Actually emitting', value);
             this.tagSearch.next(value);
         });
 

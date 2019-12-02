@@ -1,9 +1,11 @@
+import {AppDataFilterWhere} from './data-filter-where.model';
+
 export class AppDataFilter {
     limit: number;
     offset: number;
     // filter.order = {name: 'Asc'}
     order: {[index: string]: string};
-    where: any;
+    where: AppDataFilterWhere;
 
     getPage(isZeroBased = true): number {
         const add = isZeroBased ? 0 : 1;

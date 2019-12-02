@@ -85,11 +85,7 @@ export class SongContainerComponent implements OnInit {
             );
     }
 
-    handleTagSearch(searchString: string): void {
-        const dataFilter = this.createDataFilter();
-        dataFilter.where = [];
-        dataFilter.where.search = searchString;
-
+    handleTagSearch(dataFilter: AppDataFilter): void {
         this.setTagsListDataFilter(dataFilter);
         this.fetchTags()
             .pipe(finalize(() => {
@@ -97,6 +93,36 @@ export class SongContainerComponent implements OnInit {
             .subscribe(() => {
                 }
             );
+    }
+
+    handleTagAttach(tag: SbTag): void {
+        if (!this.currentSong) {
+            console.error('The current song is not set, unable to attach the tag');
+        } else {
+            this.songRepository.attachTagToSong(tag, this.currentSong).subscribe(sbSong => {
+                // set current song + search new tags list
+                this.setCurrentSong(sbSong);
+            });
+        }
+    }
+
+    handleTagDetach(tag: SbTag): void {
+        if (!this.currentSong) {
+            console.error('The current song is not set, unable to dettach the tag');
+        } else {
+            this.songRepository.detachTagFromSong(tag, this.currentSong).subscribe(sbSong => {
+                // set current song + search new tags list
+                this.setCurrentSong(sbSong);
+            });
+        }
+    }
+
+    handleTagRemove(tag: SbTag): void {
+
+    }
+
+    handleTagCreate(label: string): void {
+
     }
 
     handleSongSelect(song?: SbSong): void {
@@ -121,14 +147,26 @@ export class SongContainerComponent implements OnInit {
     }
 
     private viewSong(id: number): void {
+        // clear tags list until song appears
+        this.foundTags = [];
+
         this.songRepository.findSong(id).subscribe(fullSong => {
             console.log('Obtained full version of song:', fullSong);
-            this.currentSong = fullSong;
+            this.setCurrentSong(fullSong);
         });
+
         this.view = SongViewEnum.SONG_VIEW;
         this.isToolbarShown = true;
-        console.log('Repl state,,,,,,,,', id);
         this.location.replaceState('/song/' + id);
+    }
+
+    private setCurrentSong(song: SbSong): void {
+        this.currentSong = song;
+
+        const filter = this.songRepository.createDataFilter();
+        this.songRepository.buildTagSearchDataFilterBySong(filter, '', song);
+        this.setTagsListDataFilter(filter);
+        this.fetchTags().subscribe(() => {});
     }
 
     private setSongsListDataFilter(dataFilter: AppDataFilter): void {

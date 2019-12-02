@@ -22,6 +22,9 @@
                 [song]="currentSong"
                 [foundTags]="foundTags"
                 (tagSearch)="handleTagSearch($event)"
+                (tagAttach)="handleTagAttach($event)"
+                (tagDetach)="handleTagDetach($event)"
+                (tagCreate)="handleTagCreate($event)"
                 *ngIf="view === viewNameEnum.SONG_VIEW"
             ></sb-song-view>
         </div>

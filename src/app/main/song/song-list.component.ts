@@ -5,6 +5,8 @@ import {PageEvent} from '@angular/material';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
+import {SbSongRepository} from '../../shared/repositories/song.repository';
+import {AppDataFilterWhere} from '../../shared/models/data-filter-where.model';
 
 @Component({
     selector: 'sb-song-list',
@@ -77,8 +79,10 @@ export class SongListComponent implements OnInit {
 
             if (typeof value === 'string') {
                 console.log('to search');
+                const where = new AppDataFilterWhere();
+                where.search = value;
+                this.dataFilter.where = where;
 
-                this.dataFilter.where = {search: value};
                 this.filterChange.next(this.dataFilter);
             }
 
