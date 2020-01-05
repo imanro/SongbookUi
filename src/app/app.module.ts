@@ -27,6 +27,7 @@ import {ContentModule} from './layout/components/content/content.module';
 import {AppConfig} from './app.config';
 import {SbSongRepository} from './shared/repositories/song.repository';
 import {SbSongMockRepository} from './shared/repositories/song-mock.repository';
+import {SbSongApiRepository} from './shared/repositories/song-api.repository';
 
 export function initializeApp(appConfig: AppConfig): () => void {
     return () => {
@@ -80,7 +81,7 @@ export function initializeApp(appConfig: AppConfig): () => void {
             multi: true
         },
         {
-            provide: SbSongRepository, useClass: SbSongMockRepository
+            provide: SbSongRepository, useClass: SbSongApiRepository
         },
         AppConfig
     ],

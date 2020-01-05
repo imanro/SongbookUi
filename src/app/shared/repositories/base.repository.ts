@@ -125,4 +125,35 @@ export abstract class SbBaseRepository {
             return true;
         });
     }
+
+    protected getApiUrl(path: string, filter?: AppDataFilter): string {
+        let url = this.appConfig.apiUrl + path;
+
+        const params = [];
+        if (filter.where && filter.where.search && filter.where.search.length > 2) {
+            params.push('search=' + filter.where.search);
+        }
+
+        if (filter.limit && filter.limit > 0) {
+            params.push('size=' + filter.limit);
+        }
+
+        if (filter.offset && filter.offset > 0) {
+            params.push('page=' + filter.getPage());
+        }
+
+        if (filter.order) {
+           for (const by in filter.order) {
+               if (filter.order.hasOwnProperty(by)) {
+                   params.push('sort=' + by + ',', filter.order[by]);
+               }
+           }
+        }
+
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+
+        return url;
+    }
 }

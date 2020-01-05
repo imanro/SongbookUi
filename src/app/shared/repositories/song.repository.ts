@@ -6,9 +6,18 @@ import {SbSong} from '../models/song.model';
 import {ApiResult} from '../models/api-result.model';
 import {SbTag} from '../models/tag.model';
 import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../models/data-filter-where.model';
+import {SbSongContent} from '../models/song-content.model';
 
 @Injectable()
 export abstract class SbSongRepository extends SbBaseRepository {
+
+    static createSong(): SbSong {
+        return new SbSong();
+    }
+    static createSongContent(): SbSongContent {
+        return new SbSongContent();
+    }
+
     abstract findSongs(filter: AppDataFilter): Observable<ApiResult<SbSong>>;
 
     abstract findSong(id): Observable<SbSong>;
@@ -18,6 +27,7 @@ export abstract class SbSongRepository extends SbBaseRepository {
     abstract attachTagToSong(tag: SbTag, song: SbSong): Observable<SbSong>;
 
     abstract detachTagFromSong(tag: SbTag, song: SbSong): Observable<SbSong>;
+
 
     buildTagSearchDataFilterBySong(filter: AppDataFilter, searchString: string, song: SbSong): void {
         const where = new AppDataFilterWhere();

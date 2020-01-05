@@ -9,7 +9,7 @@ export class SbSongContent extends AppDataModel {
     fileName: string;
     mimeType: string;
     isFavorite: boolean;
-    createTime: boolean;
+    createTime: Date;
     song: SbSong;
     user: SbUser;
 }
