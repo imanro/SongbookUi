@@ -2,11 +2,12 @@ import { FuseNavigation } from '@fuse/types';
 
 export const navigation: FuseNavigation[] = [
     {
-        id       : 'applications',
-        title    : 'Applications',
-        translate: 'NAV.APPLICATIONS',
+        id       : 'navigation',
+        title    : 'Navigation',
+        translate: '',
         type     : 'group',
         children : [
+            /*
             {
                 id       : 'sample',
                 title    : 'Sample',
@@ -21,6 +22,7 @@ export const navigation: FuseNavigation[] = [
                     fg       : '#FFFFFF'
                 }
             },
+             */
             {
                 id       : 'song',
                 title    : 'Songs',
