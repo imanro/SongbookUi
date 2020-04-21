@@ -1,0 +1,23 @@
+:host {
+    .list {
+        display: flex;
+        flex-wrap: wrap;
+
+        .card {
+            padding: 24px 24px 24px 48px;
+            margin-bottom: 96px;
+
+            .fuse-card {
+                min-width: 500px;
+
+                .video-container {
+                    min-height: 300px;
+
+                    iframe {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}

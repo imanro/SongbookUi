@@ -1,19 +1,18 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {SbSong} from '../../shared/models/song.model';
-import {AppDataFilter} from '../../shared/models/data-filter.model';
+import {SbSong} from '../../../shared/models/song.model';
+import {AppDataFilter} from '../../../shared/models/data-filter.model';
 import {PageEvent} from '@angular/material';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
-import {SbSongRepository} from '../../shared/repositories/song.repository';
-import {AppDataFilterWhere} from '../../shared/models/data-filter-where.model';
+import {AppDataFilterWhere} from '../../../shared/models/data-filter-where.model';
 
 @Component({
     selector: 'sb-song-list',
     templateUrl: './song-list.component.html',
     styleUrls: ['./song-list.component.scss']
 })
-export class SongListComponent implements OnInit {
+export class SbSongListComponent implements OnInit {
 
     @Input()
     songs: SbSong[];

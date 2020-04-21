@@ -3,20 +3,26 @@ import {AppConfig, IAppConfig} from '../../app.config';
 import {BehaviorSubject, Subject, combineLatest as observableCombineLatest, Observable} from 'rxjs';
 import {SongViewEnum} from '../../shared/enums/song.view.enum';
 import {SbSongRepository} from '../../shared/repositories/song.repository';
+import {SbTagRepository} from '../../shared/repositories/tag.repository';
 import {SbSong} from '../../shared/models/song.model';
 import {AppDataFilter} from '../../shared/models/data-filter.model';
 import {Location} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
-import {finalize} from 'rxjs/operators';
+import {finalize, switchMap} from 'rxjs/operators';
 import * as _ from 'lodash';
 import {SbTag} from '../../shared/models/tag.model';
+import {TagCreateAttachModel} from '../../shared/models/tag-create-attach.model';
+import {SbFormErrors} from '../../shared/models/form-errors.model';
+import {SbSongContent} from '../../shared/models/song-content.model';
+import {SbSongContentRepository} from '../../shared/repositories/content.repository';
+import {SbUser} from '../../shared/models/user.model';
 
 @Component({
     selector: 'sb-song-container',
     templateUrl: './song-container.component.html',
     styleUrls: ['./song-container.component.scss']
 })
-export class SongContainerComponent implements OnInit {
+export class SbSongContainerComponent implements OnInit {
 
     view: string;
 
@@ -30,6 +36,8 @@ export class SongContainerComponent implements OnInit {
 
     currentSong: SbSong;
 
+    user: SbUser;
+
     viewNameEnum: any;
 
     songsListDataFilter: AppDataFilter;
@@ -40,6 +48,8 @@ export class SongContainerComponent implements OnInit {
 
     tagsListDataFilterPrevInstance: AppDataFilter;
 
+    formErrors$ = new Subject<SbFormErrors>();
+
     isLoading = false;
 
     isToolbarShown = false;
@@ -48,6 +58,8 @@ export class SongContainerComponent implements OnInit {
         private appConfig: AppConfig,
         private location: Location,
         private songRepository: SbSongRepository,
+        private tagRepository: SbTagRepository,
+        private contentRepository: SbSongContentRepository,
         private activatedRoute: ActivatedRoute
     ) {
         this.viewNameEnum = SongViewEnum;
@@ -63,6 +75,13 @@ export class SongContainerComponent implements OnInit {
         // fetch initial lists
         this.fetchSongs().subscribe(() => {});
         this.fetchTags().subscribe(() => {});
+
+        this.assignCurrentUser();
+    }
+
+    assignCurrentUser(): void {
+        this.user = new SbUser();
+        this.user.id = 1;
     }
 
     handleSongsListFilterChange(dataFilter: AppDataFilter): void {
@@ -121,8 +140,15 @@ export class SongContainerComponent implements OnInit {
 
     }
 
-    handleTagCreate(label: string): void {
-
+    handleTagCreateAndAttach(obj: TagCreateAttachModel): void {
+        const tag = this.tagRepository.createTag();
+        tag.title = obj.tagTitle;
+        this.tagRepository.saveTag(tag).subscribe((createdTag: SbTag) => {
+            this.songRepository.attachTagToSong(createdTag, this.currentSong).subscribe(sbSong => {
+                // set current song + search new tags list
+                this.setCurrentSong(sbSong);
+            });
+        });
     }
 
     handleSongSelect(song?: SbSong): void {
@@ -144,6 +170,33 @@ export class SongContainerComponent implements OnInit {
         this.view = SongViewEnum.SONG_LIST;
         this.isToolbarShown = false;
         this.location.replaceState('/song');
+    }
+
+    handleContentVideoAdd(content: SbSongContent): void {
+
+        this.isLoading = true;
+
+        content.song = this.currentSong;
+        content.user = this.user;
+
+        this.contentRepository.save(content)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                }),
+                // take original song because song is missing in the response
+                switchMap(savedContent => this.songRepository.findSong(content.song.id))
+                )
+            .subscribe(song => {
+                // updated song
+                this.currentSong = song;
+                }
+            );
+
+        // okay, just transfer this to the repository, show loading and then re-read song
+
+        // assign right type and the content itself
+        console.log('Received', content);
     }
 
     private viewSong(id: number): void {
@@ -215,9 +268,11 @@ export class SongContainerComponent implements OnInit {
     }
 
     private fetchTags(): Observable<void> {
+        console.log('Fetch tags by filter', this.tagsListDataFilter);
+        this.tagsListDataFilter.limit = 10;
 
         return new Observable<void>(observer => {
-            this.songRepository.findTags(this.tagsListDataFilter).subscribe(result => {
+            this.tagRepository.findTags(this.tagsListDataFilter).subscribe(result => {
                 this.foundTags = result.rows;
                 this.foundTagsCount = result.totalCount;
                 console.log('Found tags', result.rows);
@@ -239,6 +294,7 @@ export class SongContainerComponent implements OnInit {
     private processRoute(): void {
         observableCombineLatest([this.activatedRoute.url, this.activatedRoute.params])
             .subscribe(results => {
+                console.log('SB: were here', results[1]);
                 const segments = results[0];
                 const params = results[1];
 

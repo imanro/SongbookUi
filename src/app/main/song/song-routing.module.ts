@@ -1,17 +1,17 @@
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
-import {SongContainerComponent} from './song-container.component';
+import {SbSongContainerComponent} from './song-container.component';
 
 const routes = [
     {
         path     : '',
-        component: SongContainerComponent,
+        component: SbSongContainerComponent,
         pathMatch: 'full'
     },
     {
         // new song form
         path     : ':songId',
-        component: SongContainerComponent,
+        component: SbSongContainerComponent,
         pathMatch: 'full',
     },
 ];

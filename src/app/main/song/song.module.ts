@@ -1,25 +1,38 @@
 import { NgModule } from '@angular/core';
-import { SongContainerComponent } from './song-container.component';
 import {SbSongRoutingModule} from './song-routing.module';
-import { SongListComponent } from './song-list.component';
+import {FuseSharedModule} from '../../../@fuse/shared.module';
+
 import {
     MatFormFieldModule,
     MatChipsModule,
     MatInputModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    MatTableModule, MatIconModule, MatAutocompleteModule
+    MatTabsModule,
+    MatTableModule, MatIconModule, MatAutocompleteModule,
+    MatButtonModule
 } from '@angular/material';
-import {FuseSharedModule} from '../../../@fuse/shared.module';
-import { SongViewComponent } from './song-view.component';
+import { SbSongListComponent } from './song-list/song-list.component';
+import { SbSongViewComponent } from './song-view/song-view.component';
+import { SbSongContainerComponent } from './song-container.component';
+import { SbSongContentListVideoComponent } from './song-content-list-video/song-content-list-video.component';
+import { SongContentVideoFrameDirective } from './song-content-list-video/song-content-video-frame.directive';
+import { SbSongContentVideoAddComponent } from './song-content-add-video/song-content-video-add.component';
+import { SongHeaderComponent } from './song-header/song-header.component';
+import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
 
 @NgModule({
     declarations: [
-        SongContainerComponent,
-        SongListComponent,
-        SongViewComponent
+        SbSongContainerComponent,
+        SbSongListComponent,
+        SbSongViewComponent,
+        SbSongContentListVideoComponent,
+        SongContentVideoFrameDirective,
+        SbSongContentVideoAddComponent,
+        SongHeaderComponent
     ],
     imports     : [
+        SbSongRoutingModule,
         FuseSharedModule,
         MatAutocompleteModule,
         MatIconModule,
@@ -29,7 +42,9 @@ import { SongViewComponent } from './song-view.component';
         MatInputModule,
         MatFormFieldModule,
         MatChipsModule,
-        SbSongRoutingModule
+        MatTabsModule,
+        MatButtonModule,
+        SbUiUtilsModule
     ]
 })
 

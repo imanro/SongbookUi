@@ -1,0 +1,20 @@
+<form fxLayout="column" fxLayoutAlign="start"
+      fxFlex="1 0 auto" name="form" [formGroup]="contentAddVideoForm" (ngSubmit)="handleContentVideoAdd()">
+
+    <div class="h3 mb-16">Add Video</div>
+
+    <div fxLayout="row" fxLayoutAlign="start center" fxFlex="1 0 auto">
+
+        <mat-form-field fxFlex="80" class="pr-4" *ngIf="getContentAddVideoFormControl('content'); let contentInput;">
+            <mat-label>Url</mat-label>
+            <input matInput formControlName="content" sbAutofocus required>
+            <mat-error *ngIf="contentInput.hasError('required')"><span class="text">Mandatory</span></mat-error>
+            <mat-error *ngIf="contentInput.hasError('url')"><span class="text">The URL is wrong</span></mat-error>
+        </mat-form-field>
+
+        <div fxFlex="20" class="pl-4" fxLayout="row">
+            <button type="submit" mat-flat-button color="primary" fxFlex="1 1 100%">Add</button>
+        </div>
+
+    </div>
+</form>

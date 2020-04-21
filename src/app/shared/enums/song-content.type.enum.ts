@@ -1,6 +1,6 @@
 export enum SbSongContentTypeEnum {
-    HEADER = 'header',
-    INLINE = 'inline',
-    LINK = 'link',
-    GDRIVE_CLOUD_FILE = 'gdrive_cloud_file'
+    HEADER = 'HEADER',
+    INLINE = 'INLINE',
+    LINK = 'LINK',
+    GDRIVE_CLOUD_FILE = 'GDRIVE_CLOUD_FILE'
 }

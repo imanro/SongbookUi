@@ -23,7 +23,7 @@ export class AppConfig implements IAppConfig {
 
     // appVersion = versionInfo.hash;
 
-    listRowsLimit = 10;
+    listRowsLimit = 20;
 
     constructor(
         private http: HttpClient

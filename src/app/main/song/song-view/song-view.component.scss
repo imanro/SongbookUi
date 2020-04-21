@@ -1,0 +1,16 @@
+@import '../../../../styles/variables';
+
+:host {
+    .controls-row {
+        button {
+            font-size: 21px;
+        }
+    }
+
+    .content-add-video-container {
+        sb-song-content-video-add {
+            background: $sb-form-panel-bg-color;
+            border-radius: $sb-form-panel-border-radius;
+        }
+    }
+}

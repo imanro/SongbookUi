@@ -1,0 +1,15 @@
+<div class="list">
+    <div class="card" *ngFor="let item of getVideoContent()">
+        <div class="fuse-card">
+
+            <div class="position-relative video-container">
+                <iframe sbSongContentVideoFrame [url]="item.content" [width]="'500'"></iframe>
+                <!-- <iframe [src]="item.content" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+            </div>
+
+            <div class="p-16">
+                <a href="{{item.content}}">{{item.content}}</a>
+            </div>
+        </div>
+    </div>
+</div>

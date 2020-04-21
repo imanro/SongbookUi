@@ -1,27 +1,31 @@
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Component, Input, ViewChild, ElementRef, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
-import {SbSong} from '../../shared/models/song.model';
-import {SbTag} from '../../shared/models/tag.model';
+import {SbSong} from '../../../shared/models/song.model';
+import {SbTag} from '../../../shared/models/tag.model';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {AppDataFilter} from '../../shared/models/data-filter.model';
-import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../../shared/models/data-filter-where.model';
-import {SbSongRepository} from '../../shared/repositories/song.repository';
+import {AppDataFilter} from '../../../shared/models/data-filter.model';
+import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../../../shared/models/data-filter-where.model';
+import {SbSongRepository} from '../../../shared/repositories/song.repository';
 import {MatAutocompleteSelectedEvent} from '@angular/material';
+import {TagCreateAttachModel} from '../../../shared/models/tag-create-attach.model';
+import {SbFormErrors} from '../../../shared/models/form-errors.model';
+import {SbSongContent} from '../../../shared/models/song-content.model';
+import {CustomValidators} from 'ng2-validation';
 
 @Component({
   selector: 'sb-song-view',
   templateUrl: './song-view.component.html',
   styleUrls: ['./song-view.component.scss']
 })
-export class SongViewComponent implements OnInit, OnDestroy {
+export class SbSongViewComponent implements OnInit, OnDestroy {
 
-    @Input()
-    song: SbSong;
+    @Input() song: SbSong;
 
-    @Input()
-    foundTags: SbTag[];
+    @Input() foundTags: SbTag[];
+
+    @Input() formErrors$: Subject<SbFormErrors>;
 
     @Output() tagSearch = new EventEmitter<AppDataFilter>();
 
@@ -29,13 +33,17 @@ export class SongViewComponent implements OnInit, OnDestroy {
 
     @Output() tagDetach = new EventEmitter<SbTag>();
 
-    @Output() tagCreate = new EventEmitter<string>();
+    @Output() tagCreateAttach = new EventEmitter<TagCreateAttachModel>();
+
+    @Output() contentVideoAdd = new EventEmitter<SbSongContent>();
 
     @ViewChild('tagInput', {static: false}) tagInput: ElementRef<HTMLInputElement>;
 
     separatorKeysCodes: number[] = [ENTER, COMMA];
 
     tagCtrl = new FormControl();
+
+    isContentVideoAddShown = false;
 
     private search$: Subject<AppDataFilter> = new Subject();
 
@@ -57,22 +65,15 @@ export class SongViewComponent implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    getHeadersString(): string {
-      if (this.song.headers) {
-          const array = [];
-          for (const header of this.song.headers) {
-              array.push(header.content);
-          }
-
-          return array.join(', ');
-
-      } else {
-          return '';
-      }
-  }
-
     handleTagCreate($chipEvent: any): void {
+        console.log('The native element value:', this.tagInput.nativeElement.value);
         console.log('Create tag', $chipEvent.value);
+        const obj: TagCreateAttachModel = {song: this.song, tagTitle: $chipEvent.value};
+        this.tagCreateAttach.next(obj);
+
+        if ($chipEvent.input) {
+            $chipEvent.input.value = '';
+        }
     }
 
     handleTagAttach(tag: MatAutocompleteSelectedEvent): void {
@@ -84,10 +85,14 @@ export class SongViewComponent implements OnInit, OnDestroy {
         this.tagDetach.next(tag);
     }
 
+    handleContentVideoAddToggle(): void {
+        this.isContentVideoAddShown = !this.isContentVideoAddShown;
+    }
+
     handleTagSearch(e: any): void {
 
         if (e.key === this.keyEnter) {
-            console.log('Just do notning');
+            console.log('Just do nothing');
 
         } else {
 
@@ -104,6 +109,11 @@ export class SongViewComponent implements OnInit, OnDestroy {
                 console.log('Song is null, not emitting the search');
             }
         }
+    }
+
+    handleContentVideoAdd(content: SbSongContent): void {
+        this.isContentVideoAddShown = false;
+        this.contentVideoAdd.next(content);
     }
 
     private initSearch(): void {

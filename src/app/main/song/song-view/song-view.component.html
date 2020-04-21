@@ -1,0 +1,59 @@
+<div class="px-16" *ngIf="song">
+
+    <sb-song-header [song]="song"></sb-song-header>
+
+<!--    to show here: -->
+
+    <!--    other titles, content items (video, texts etc.), tags, [amount of performances, calendar with performances] -->
+    <!--    [matching with another songs (often taken before/after)] -->
+    <!--    form for adding content, [input for tags] -->
+    <div fxLayout="row wrap" fxLayoutAlign="start center" class="tags-editor">
+        <mat-form-field class="tag-list" fxFlex="100">
+            <mat-chip-list #chipList aria-label="Fruit selection" (keyup)="handleTagSearch($event)">
+                <mat-chip
+                    *ngFor="let tag of song.tags"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="handleTagDetach(tag)"
+                >
+                    {{tag.title}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input
+                    placeholder="Song tags"
+                    #tagInput
+                    [formControl]="tagCtrl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="false"
+                    (matChipInputTokenEnd)="handleTagCreate($event)">
+            </mat-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleTagAttach($event)">
+                <mat-option *ngFor="let tag of foundTags" [value]="tag">
+                    {{tag.title}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+    <mat-tab-group>
+
+        <mat-tab label="Video">
+
+            <div class="controls-row my-16 mx-16" fxLayoutAlign="end start">
+                <button mat-fab color="accent" fxFlex="0 0 auto" (click)="handleContentVideoAddToggle()">+</button>
+            </div>
+
+            <div class="content-add-video-container my-16 mx-16" fxLayoutAlign="end start" *ngIf="isContentVideoAddShown">
+                <sb-song-content-video-add [formErrors$]="formErrors$" (contentVideoAdd)="handleContentVideoAdd($event)" fxFlex="50" class="p-8"></sb-song-content-video-add>
+            </div>
+
+            <sb-song-content-list-video
+                [song]="song"
+            >
+            </sb-song-content-list-video>
+        </mat-tab>
+        <mat-tab label="Files"> Content 2 </mat-tab>
+    </mat-tab-group>
+
+</div>
