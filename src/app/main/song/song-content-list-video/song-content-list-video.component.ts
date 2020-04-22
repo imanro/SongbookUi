@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {SbSong} from '../../../shared/models/song.model';
 import {SbSongContent} from '../../../shared/models/song-content.model';
 import {SbSongContentTypeEnum} from '../../../shared/enums/song-content.type.enum';
@@ -14,6 +14,8 @@ export class SbSongContentListVideoComponent implements OnInit {
 
     @Input() song: SbSong;
 
+    @Output() contentRemove = new EventEmitter<SbSongContent>();
+
     constructor(
         private songContentVideoService: SbSongContentVideoService
     ) {
@@ -25,6 +27,10 @@ export class SbSongContentListVideoComponent implements OnInit {
 
     getVideoContent(): SbSongContent[] {
         return this.songContentVideoService.getSongContentVideo(this.song);
+    }
+
+    handleContentRemove(item: SbSongContent): void {
+        this.contentRemove.next(item);
     }
 
 

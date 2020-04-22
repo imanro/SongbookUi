@@ -37,6 +37,8 @@ export class SbSongViewComponent implements OnInit, OnDestroy {
 
     @Output() contentVideoAdd = new EventEmitter<SbSongContent>();
 
+    @Output() contentRemove = new EventEmitter<SbSongContent>();
+
     @ViewChild('tagInput', {static: false}) tagInput: ElementRef<HTMLInputElement>;
 
     separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -114,6 +116,10 @@ export class SbSongViewComponent implements OnInit, OnDestroy {
     handleContentVideoAdd(content: SbSongContent): void {
         this.isContentVideoAddShown = false;
         this.contentVideoAdd.next(content);
+    }
+
+    handleContentRemove(item: SbSongContent): void {
+        this.contentRemove.next(item);
     }
 
     private initSearch(): void {

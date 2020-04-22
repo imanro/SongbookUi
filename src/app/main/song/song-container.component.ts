@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AppConfig, IAppConfig} from '../../app.config';
-import {BehaviorSubject, Subject, combineLatest as observableCombineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, Subject, combineLatest as observableCombineLatest, Observable, of} from 'rxjs';
 import {SongViewEnum} from '../../shared/enums/song.view.enum';
 import {SbSongRepository} from '../../shared/repositories/song.repository';
 import {SbTagRepository} from '../../shared/repositories/tag.repository';
@@ -8,7 +8,7 @@ import {SbSong} from '../../shared/models/song.model';
 import {AppDataFilter} from '../../shared/models/data-filter.model';
 import {Location} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
-import {finalize, switchMap} from 'rxjs/operators';
+import {finalize, switchMap, tap} from 'rxjs/operators';
 import * as _ from 'lodash';
 import {SbTag} from '../../shared/models/tag.model';
 import {TagCreateAttachModel} from '../../shared/models/tag-create-attach.model';
@@ -185,7 +185,7 @@ export class SbSongContainerComponent implements OnInit {
                     this.isLoading = false;
                 }),
                 // take original song because song is missing in the response
-                switchMap(savedContent => this.songRepository.findSong(content.song.id))
+                switchMap(savedContent => this.refreshCurrentSong())
                 )
             .subscribe(song => {
                 // updated song
@@ -197,6 +197,31 @@ export class SbSongContainerComponent implements OnInit {
 
         // assign right type and the content itself
         console.log('Received', content);
+    }
+
+    handleContentRemove(content: SbSongContent): void {
+
+        this.isLoading = true;
+        console.log('to remove:', content);
+
+        this.contentRepository.delete(content)
+            .pipe(
+                tap((r) => console.log("executed", r)),
+                finalize(() => {
+                    this.isLoading = false;
+                }),
+                switchMap(() => this.refreshCurrentSong())
+            ).subscribe(song => {
+                this.currentSong = song;
+        });
+    }
+
+    private refreshCurrentSong(): Observable<SbSong | null> {
+        if (this.currentSong) {
+            return this.songRepository.findSong(this.currentSong.id);
+        } else {
+            return of(null);
+        }
     }
 
     private viewSong(id: number): void {

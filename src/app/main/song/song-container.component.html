@@ -27,6 +27,7 @@
                 (tagDetach)="handleTagDetach($event)"
                 (tagCreateAttach)="handleTagCreateAndAttach($event)"
                 (contentVideoAdd)="handleContentVideoAdd($event)"
+                (contentRemove)="handleContentRemove($event)"
                 *ngIf="view === viewNameEnum.SONG_VIEW"
             ></sb-song-view>
         </div>

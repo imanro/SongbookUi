@@ -26,6 +26,16 @@ export class SbSongContentRepository extends SbBaseRepository {
             );
     }
 
+    delete(entity: SbSongContent): Observable<SbSongContent> {
+
+        const url = this.getApiUrl('/song-content/' + entity.id);
+
+        return this.http.delete(url)
+            .pipe(
+                catchError(this.handleHttpError<SbSongContent>())
+            );
+    }
+
 
     private mapToEntity(data: any): SbSongContent {
         const mapper = new SbSongContentMapper();

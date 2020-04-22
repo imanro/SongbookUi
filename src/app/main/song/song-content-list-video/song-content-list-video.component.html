@@ -1,15 +1,20 @@
-<div class="list">
-    <div class="card" *ngFor="let item of getVideoContent()">
-        <div class="fuse-card">
+<div class="list" fxLayout="row wrap" fxLayoutAlign="start">
+    <div class="card" *ngFor="let item of getVideoContent()" fxFlex="0 0 auto">
+        <div class="fuse-card" fxLayout="row" fxFlex="1 0 auto">
+            <div class="content-container" fxFlex="1 0 auto">
+                <div class="position-relative video-container">
+                    <iframe sbSongContentVideoFrame [url]="item.content" [width]="'500'"></iframe>
+                    <!-- <iframe [src]="item.content" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+                </div>
 
-            <div class="position-relative video-container">
-                <iframe sbSongContentVideoFrame [url]="item.content" [width]="'500'"></iframe>
-                <!-- <iframe [src]="item.content" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
-            </div>
-
-            <div class="p-16">
-                <a href="{{item.content}}">{{item.content}}</a>
+                <div class="p-16">
+                    <a href="{{item.content}}">{{item.content}}</a>
+                </div>
             </div>
         </div>
+        <div fxFlex="0 0 24px" class="actions-container">
+            <mat-icon (click)="handleContentRemove(item)">delete</mat-icon>
+        </div>
     </div>
+
 </div>

@@ -50,6 +50,7 @@
 
             <sb-song-content-list-video
                 [song]="song"
+                (contentRemove)="handleContentRemove($event)"
             >
             </sb-song-content-list-video>
         </mat-tab>
