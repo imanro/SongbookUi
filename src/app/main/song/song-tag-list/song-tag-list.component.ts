@@ -15,9 +15,9 @@ import {debounceTime, takeUntil} from 'rxjs/operators';
 })
 export class SongTagListComponent implements OnInit, OnDestroy {
 
-    @Input() song: SbSong;
+    @Input() tags: SbTag[] = [];
 
-    @Input() foundTags: SbTag[];
+    @Input() foundTags: SbTag[] = [];
 
     @Input() title = 'Song tags';
 
@@ -25,7 +25,7 @@ export class SongTagListComponent implements OnInit, OnDestroy {
 
     @Output() tagRemove = new EventEmitter<SbTag>();
 
-    @Output() tagCreate = new EventEmitter<TagCreateAttachModel>();
+    @Output() tagCreate = new EventEmitter<string>();
 
     @Output() tagSearch = new EventEmitter<string>();
 
@@ -52,11 +52,12 @@ export class SongTagListComponent implements OnInit, OnDestroy {
         this.unsubscribe$.next();
     }
 
+    get inputTitle(): string {
+        return this.tags.length == 0 ? this.title : '';
+    }
+
     handleTagCreate($chipEvent: any): void {
-        console.log('The native element value:', this.tagInput.nativeElement.value);
-        console.log('Create tag', $chipEvent.value);
-        const obj: TagCreateAttachModel = {song: this.song, tagTitle: $chipEvent.value};
-        this.tagCreate.next(obj);
+        this.tagCreate.next($chipEvent.value);
 
         if ($chipEvent.input) {
             $chipEvent.input.value = '';

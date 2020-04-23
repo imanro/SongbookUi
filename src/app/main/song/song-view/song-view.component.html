@@ -8,7 +8,7 @@
     <!--    [matching with another songs (often taken before/after)] -->
     <!--    form for adding content, [input for tags] -->
     <sb-song-tag-list
-        [song]="song"
+        [tags]="song.tags"
         [foundTags]="foundTags"
         (tagSearch)="handleTagSearch($event)"
         (tagSelect)="handleTagAttach($event)"

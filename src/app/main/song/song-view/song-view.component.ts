@@ -2,7 +2,6 @@ import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angula
 import {SbSong} from '../../../shared/models/song.model';
 import {SbTag} from '../../../shared/models/tag.model';
 import {Subject} from 'rxjs';
-import {TagCreateAttachModel} from '../../../shared/models/tag-create-attach.model';
 import {SbFormErrors} from '../../../shared/models/form-errors.model';
 import {SbSongContent} from '../../../shared/models/song-content.model';
 
@@ -25,7 +24,7 @@ export class SbSongViewComponent implements OnInit, OnDestroy {
 
     @Output() tagDetach = new EventEmitter<SbTag>();
 
-    @Output() tagCreateAttach = new EventEmitter<TagCreateAttachModel>();
+    @Output() tagCreateAttach = new EventEmitter<string>();
 
     @Output() contentVideoAdd = new EventEmitter<SbSongContent>();
 
@@ -47,8 +46,8 @@ export class SbSongViewComponent implements OnInit, OnDestroy {
         this.unsubscribe$.complete();
     }
 
-    handleTagCreate(tagCreateAttachModel: TagCreateAttachModel): void {
-        this.tagCreateAttach.next(tagCreateAttachModel);
+    handleTagCreate(tagName: string): void {
+        this.tagCreateAttach.next(tagName);
     }
 
     handleTagAttach(tag: SbTag): void {

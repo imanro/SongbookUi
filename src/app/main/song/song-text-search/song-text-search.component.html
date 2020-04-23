@@ -1,5 +1,10 @@
-<div class="filter-cont px-20" [formGroup]="songSearchForm">
-    <mat-form-field appearance="standard" fxFlex="1 1 500px">
-        <input matInput #filter placeholder="Search for songs" formControlName="filter" autocomplete="off">
+<div class="filter-cont" [formGroup]="songSearchForm">
+    <mat-form-field appearance="standard" fxFlex="1 1 auto">
+        <input matInput #filter placeholder="{{title}}" formControlName="filter" autocomplete="off" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let song of foundSongs" [value]="song.header" (onSelectionChange)="handleSongSelect(song)">
+                {{song.header}}
+            </mat-option>
+        </mat-autocomplete>
     </mat-form-field>
 </div>

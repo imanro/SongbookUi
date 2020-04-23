@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {SbSong} from '../../../shared/models/song.model';
 
 @Component({
     selector: 'sb-song-text-search',
@@ -12,7 +13,13 @@ export class SongTextSearchComponent implements OnInit {
 
     @Input() searchText: string;
 
+    @Input() title = 'Search for songs';
+
+    @Input() foundSongs: SbSong[] = [];
+
     @Output() songTextSearch = new EventEmitter<string>();
+
+    @Output() songSelect = new EventEmitter<SbSong>();
 
     songSearchForm: FormGroup;
 
@@ -29,6 +36,10 @@ export class SongTextSearchComponent implements OnInit {
     ngOnInit(): void {
         this.subscribeOnSongSearch();
         this.setSongSearchFormValues();
+    }
+
+    handleSongSelect(song: SbSong): void {
+        this.songSelect.next(song);
     }
 
     private buildSongSearchForm(): void {

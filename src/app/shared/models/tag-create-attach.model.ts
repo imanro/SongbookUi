@@ -1,6 +1,6 @@
 import {SbSong} from './song.model';
 
-export interface TagCreateAttachModel {
+export class TagCreateAttachModel {
     song: SbSong;
     tagTitle: string;
 }

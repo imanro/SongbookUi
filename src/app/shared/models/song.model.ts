@@ -13,4 +13,8 @@ export class SbSong extends AppDataModel {
     tags: SbTag[];
     headers: SbSongContent[];
     content: SbSongContent[];
+
+    get header(): string {
+        return this.headers.length > 0 ? this.headers[0].content : this.title;
+    }
 }

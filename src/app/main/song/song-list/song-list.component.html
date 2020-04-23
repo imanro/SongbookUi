@@ -7,11 +7,22 @@
 
         <ng-container matColumnDef="title">
             <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
-            <mat-cell *matCellDef="let item"> {{item.title}}</mat-cell>
+            <mat-cell *matCellDef="let item"> {{item.header}}</mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="handleSongSelect(row)"></mat-row>
+     <ng-container matColumnDef="tags">
+         <mat-header-cell *matHeaderCellDef> Tags </mat-header-cell>
+         <mat-cell *matCellDef="let item">
+             <mat-chip-list *ngIf="item.tags && item.tags.length > 0">
+                 <mat-chip *ngFor="let tag of item.tags" (click)="handleTagSelect(tag)">{{tag.title}}</mat-chip>
+             </mat-chip-list>
+
+         </mat-cell>
+     </ng-container>
+
+
+     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+     <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="handleSongSelect(row)"></mat-row>
     </mat-table>
     <mat-paginator [length]="songsCount"
                    [pageSize]="dataFilter.limit"

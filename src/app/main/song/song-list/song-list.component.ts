@@ -2,6 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {SbSong} from '../../../shared/models/song.model';
 import {AppDataFilter} from '../../../shared/models/data-filter.model';
 import {PageEvent} from '@angular/material';
+import {SbTag} from '../../../shared/models/tag.model';
 
 @Component({
     selector: 'sb-song-list',
@@ -25,9 +26,12 @@ export class SbSongListComponent implements OnInit {
     @Output()
     songSelect = new EventEmitter<SbSong>();
 
+    @Output()
+    tagSelect = new EventEmitter<SbTag>();
+
     @ViewChild('filter', {static: false}) filter: ElementRef;
 
-    displayedColumns = ['id', 'title'];
+    displayedColumns = ['id', 'title', 'tags'];
 
     constructor(
     ) {
@@ -44,6 +48,10 @@ export class SbSongListComponent implements OnInit {
 
     handleSongSelect(song: SbSong): void {
         this.songSelect.next(song);
+    }
+
+    handleTagSelect(tag: SbTag): void {
+        this.tagSelect.next(tag);
     }
 
 

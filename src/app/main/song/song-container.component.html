@@ -11,15 +11,35 @@
             </div>
 
             <ng-container *ngIf="view === viewNameEnum.SONG_LIST">
-                <sb-song-text-search
-                    [searchText]="songListSearchText"
-                    (songTextSearch)="handleSongTextSearch($event)"
-                ></sb-song-text-search>
+
+                <div class="search-container px-20">
+                    <sb-song-text-search
+                        [searchText]="songListSearchText"
+                        [title]="'Search songs by title'"
+                        (songTextSearch)="handleSongTextSearch($event)"
+                        fxFlex="1 0 auto"
+                        class="pr-8"
+                    ></sb-song-text-search>
+                    <sb-song-tag-list
+                        [tags]="songListSearchTags"
+                        [foundTags]="foundSongListSearchTags"
+                        [title]="'Search songs by tags'"
+                        (tagSelect)="handleSongListSearchTagAdd($event)"
+                        (tagRemove)="handleSongListSearchTagRemove($event)"
+                        (tagSearch)="handleSongListSearchTagSearch($event)"
+                        fxFlex="2 0 auto"
+                        class="pl-8"
+                    >
+
+                </sb-song-tag-list>
+                </div>
+
                 <sb-song-list [songs]="songs"
                               [songsCount]="songsCount"
                               [dataFilter]="songsListDataFilter"
                               (filterChange)="handleSongListFilterChange($event)"
                               (songSelect)="handleSongSelect($event)"
+                              (tagSelect)="handleSongListSearchTagAdd($event)"
                               *ngIf="view === viewNameEnum.SONG_LIST"
                 ></sb-song-list>
             </ng-container>

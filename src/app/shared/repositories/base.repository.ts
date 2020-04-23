@@ -1,7 +1,7 @@
 import { Injectable} from '@angular/core';
 import {AppConfig} from '../../app.config';
 import {AppDataFilter} from '../models/data-filter.model';
-import {AppDataFilterWhereFieldOpEnum} from '../models/data-filter-where.model';
+import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../models/data-filter-where.model';
 import {Observable, throwError} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {AppError} from '../models/error.model';
@@ -19,6 +19,11 @@ export abstract class SbBaseRepository {
     createDataFilter(): AppDataFilter {
         return new AppDataFilter();
     }
+
+    createDataFilterWhere(): AppDataFilterWhere {
+        return new AppDataFilterWhere();
+    }
+
 
     protected getApiUrl(path: string, filter?: AppDataFilter): string {
         let url = this.appConfig.apiUrl + path;
@@ -65,7 +70,13 @@ export abstract class SbBaseRepository {
         }
 
         if (params.length > 0) {
-            url += '?' + params.join('&');
+            if (url.indexOf('?') === -1) {
+                url += '?';
+            } else {
+                url += '&';
+            }
+
+            url += params.join('&');
         }
 
         return url;

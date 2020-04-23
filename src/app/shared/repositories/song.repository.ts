@@ -41,6 +41,40 @@ export abstract class SbSongRepository extends SbBaseRepository {
             );
     }
 
+    findSongsByTags(tags: SbTag[], filter: AppDataFilter): Observable<ApiResult<SbSong>> {
+        let url;
+        if (tags.length > 0) {
+            const tagIds = [];
+            for (const tag of tags) {
+                tagIds.push(tag.id);
+            }
+
+            url = this.getApiUrl('/song/tags?ids=' + tagIds.join(','), filter);
+
+        } else {
+            url = this.getApiUrl('/song', filter);
+        }
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, ApiResult<SbSong>>(response => {
+
+                    const result = new ApiResult<SbSong>();
+                    result.rows = [];
+                    result.totalCount = response.totalElements;
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const song = this.mapDataToSong(row);
+                            result.rows.push(song);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
     findSong(id): Observable<SbSong> {
         const url = this.getApiUrl('/song/' + id);
 

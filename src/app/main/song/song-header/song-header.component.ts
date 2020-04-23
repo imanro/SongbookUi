@@ -14,7 +14,7 @@ export class SongHeaderComponent implements OnInit {
     constructor() {
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
     }
 
     getHeadersString(): string {

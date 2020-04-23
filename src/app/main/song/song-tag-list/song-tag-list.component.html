@@ -1,8 +1,8 @@
 <div fxLayout="row wrap" fxLayoutAlign="start center" class="tags-editor">
-    <mat-form-field class="tag-list" fxFlex="100">
-        <mat-chip-list #chipList aria-label="Fruit selection" (keyup)="handleTagSearch($event)">
+    <mat-form-field class="tag-list" appearance="standard"  fxFlex="1 1 auto">
+        <mat-chip-list #chipList aria-label="Tag search" (keyup)="handleTagSearch($event)">
             <mat-chip
-                *ngFor="let tag of song.tags"
+                *ngFor="let tag of tags"
                 [selectable]="true"
                 [removable]="true"
                 (removed)="handleTagDetach(tag)"
@@ -11,7 +11,7 @@
                 <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip>
             <input
-                placeholder="{{title}}"
+                placeholder="{{inputTitle}}"
                 #tagInput
                 [formControl]="tagCtrl"
                 [matAutocomplete]="auto"

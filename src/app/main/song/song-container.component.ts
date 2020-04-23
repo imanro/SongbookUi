@@ -17,7 +17,7 @@ import {SbSongContent} from '../../shared/models/song-content.model';
 import {SbSongContentRepository} from '../../shared/repositories/content.repository';
 import {SbUser} from '../../shared/models/user.model';
 import {SbSongService} from '../../shared/services/song.service';
-import {AppDataFilterWhere} from '../../shared/models/data-filter-where.model';
+import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../../shared/models/data-filter-where.model';
 
 @Component({
     selector: 'sb-song-container',
@@ -34,8 +34,6 @@ export class SbSongContainerComponent implements OnInit {
 
     songsCount: number;
 
-    foundTagsCount: number;
-
     currentSong: SbSong;
 
     user: SbUser;
@@ -44,11 +42,13 @@ export class SbSongContainerComponent implements OnInit {
 
     songsListDataFilter: AppDataFilter;
 
+    songListSearchTags: SbTag[];
+
+    foundSongListSearchTags: SbTag[];
+
     tagsListDataFilter: AppDataFilter;
 
     songsListDataFilterPrevInstance: AppDataFilter;
-
-    tagsListDataFilterPrevInstance: AppDataFilter;
 
     formErrors$ = new Subject<SbFormErrors>();
 
@@ -71,18 +71,22 @@ export class SbSongContainerComponent implements OnInit {
     ngOnInit(): void {
         this.view = SongViewEnum.SONG_LIST;
         this.setSongsListDataFilter(this.createDataFilter());
-        this.setTagsListDataFilter(this.createDataFilter());
+        this.songListSearchTags = [];
 
         this.processRoute();
 
         // fetch initial lists
         this.fetchSongs().subscribe(() => {});
-        this.fetchTags().subscribe(() => {});
+
+        this.fetchTags(new AppDataFilter()).subscribe(tags => {
+            this.foundTags = tags;
+            this.foundSongListSearchTags = tags;
+        });
 
         this.assignCurrentUser();
     }
 
-    get songListSearchText() {
+    get songListSearchText(): string {
         return this.songsListDataFilter.where && this.songsListDataFilter.where.search ? this.songsListDataFilter.where.search : '';
     }
 
@@ -107,11 +111,11 @@ export class SbSongContainerComponent implements OnInit {
         if (this.currentSong) {
             const filter = this.songService.createTagSearchDataFilterBySong(searchString, this.currentSong);
 
-            this.setTagsListDataFilter(filter);
-            this.fetchTags()
+            this.fetchTags(filter)
                 .pipe(finalize(() => {
                 }))
-                .subscribe(() => {
+                .subscribe(tags => {
+                        this.foundTags = tags;
                     }
                 );
         } else {
@@ -142,9 +146,13 @@ export class SbSongContainerComponent implements OnInit {
         }
     }
 
-    handleTagCreateAndAttach(obj: TagCreateAttachModel): void {
+    handleTagCreateAndAttach(tagName: string): void {
+        const tagCreateModel = new TagCreateAttachModel();
+        tagCreateModel.tagTitle = tagName;
+        tagCreateModel.song = this.currentSong;
+
         const tag = this.tagRepository.createTag();
-        tag.title = obj.tagTitle;
+        tag.title = tagName;
         this.tagRepository.saveTag(tag).subscribe((createdTag: SbTag) => {
             this.songRepository.attachTagToSong(createdTag, this.currentSong).subscribe(sbSong => {
                 // set current song + search new tags list
@@ -218,6 +226,51 @@ export class SbSongContainerComponent implements OnInit {
         });
     }
 
+    handleSongListSearchTagAdd(tag: SbTag): void {
+
+        if (this.songListSearchTags.find(curTag => curTag.id === tag.id) === undefined) {
+            this.songListSearchTags.push(tag);
+
+            this.isLoading = true;
+
+            this.fetchSongs()
+                .pipe(finalize(() => {
+                    this.isLoading = false;
+                }))
+                .subscribe(() => {
+                    }
+                );
+        }
+    }
+
+    handleSongListSearchTagRemove(tag: SbTag): void {
+        this.songListSearchTags = this.songListSearchTags.filter(curTag => curTag.id !== tag.id);
+
+        this.fetchSongs()
+            .pipe(finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(() => {
+                }
+            );
+    }
+
+    handleSongListSearchTagSearch(searchString: string): void {
+        const filter = new AppDataFilter();
+        const where = new AppDataFilterWhere();
+        where.addField('title', searchString, AppDataFilterWhereFieldOpEnum.OP_LIKE);
+        filter.where = where;
+
+        this.fetchTags(filter)
+            .pipe(finalize(() => {
+            }))
+            .subscribe(tags => {
+                    this.foundSongListSearchTags = tags;
+                }
+            );
+
+    }
+
     private changeDataFilter(dataFilter: AppDataFilter): void {
         const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
 
@@ -264,8 +317,9 @@ export class SbSongContainerComponent implements OnInit {
         this.currentSong = song;
 
         const filter = this.songService.createTagSearchDataFilterBySong('', song);
-        this.setTagsListDataFilter(filter);
-        this.fetchTags().subscribe(() => {});
+        this.fetchTags(filter).subscribe(tags => {
+            this.foundTags = tags;
+        });
     }
 
     private setSongsListDataFilter(dataFilter: AppDataFilter): void {
@@ -282,25 +336,10 @@ export class SbSongContainerComponent implements OnInit {
         this.songsListDataFilter = dataFilter;
     }
 
-    private setTagsListDataFilter(dataFilter: AppDataFilter): void {
-
-        if (this.songsListDataFilter) {
-            console.log('set from p', JSON.stringify(this.songsListDataFilter));
-            this.tagsListDataFilterPrevInstance = _.cloneDeep(this.songsListDataFilter);
-        } else {
-            this.tagsListDataFilterPrevInstance = _.cloneDeep(dataFilter);
-        }
-
-        console.log('stldf', JSON.stringify(dataFilter), JSON.stringify(this.songsListDataFilterPrevInstance));
-
-        this.tagsListDataFilter = dataFilter;
-    }
-
-
     private fetchSongs(): Observable<void> {
 
         return new Observable<void>(observer => {
-            this.songRepository.findSongs(this.songsListDataFilter).subscribe(result => {
+            this.songRepository.findSongsByTags(this.songListSearchTags, this.songsListDataFilter).subscribe(result => {
                 this.songs = result.rows;
                 this.songsCount = result.totalCount;
                 observer.complete();
@@ -313,15 +352,13 @@ export class SbSongContainerComponent implements OnInit {
 
     }
 
-    private fetchTags(): Observable<void> {
+    private fetchTags(tagListDataFilter: AppDataFilter): Observable<SbTag[]> {
         console.log('Fetch tags by filter', this.tagsListDataFilter);
-        this.tagsListDataFilter.limit = 10;
+        tagListDataFilter.limit = 10;
 
-        return new Observable<void>(observer => {
-            this.tagRepository.findTags(this.tagsListDataFilter).subscribe(result => {
-                this.foundTags = result.rows;
-                this.foundTagsCount = result.totalCount;
-                console.log('Found tags', result.rows);
+        return new Observable<SbTag[]>(observer => {
+            this.tagRepository.findTags(tagListDataFilter).subscribe(result => {
+                observer.next(result.rows);
                 observer.complete();
 
             }, err => {
