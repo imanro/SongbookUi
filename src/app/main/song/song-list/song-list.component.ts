@@ -2,10 +2,6 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {SbSong} from '../../../shared/models/song.model';
 import {AppDataFilter} from '../../../shared/models/data-filter.model';
 import {PageEvent} from '@angular/material';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
-import {AppDataFilterWhere} from '../../../shared/models/data-filter-where.model';
 
 @Component({
     selector: 'sb-song-list',
@@ -33,17 +29,11 @@ export class SbSongListComponent implements OnInit {
 
     displayedColumns = ['id', 'title'];
 
-    songSearchForm: FormGroup;
-
-    private unsubscribe$ = new Subject<void>();
-
     constructor(
     ) {
     }
 
     ngOnInit(): void {
-        this.subscribeOnSongSearch();
-        this.setSongSearchFormValues();
     }
 
     handlePageChange(page: PageEvent): void {
@@ -54,30 +44,6 @@ export class SbSongListComponent implements OnInit {
 
     handleSongSelect(song: SbSong): void {
         this.songSelect.next(song);
-    }
-
-    private setSongSearchFormValues(): void {
-        this.songSearchForm.patchValue({filter: this.dataFilter.where && this.dataFilter.where.search ? this.dataFilter.where.search : ''});
-    }
-
-    private subscribeOnSongSearch(): void {
-        this.songSearchForm.get('filter').valueChanges.pipe(
-            takeUntil(this.unsubscribe$),
-            debounceTime(300),
-            distinctUntilChanged()
-        ).subscribe(value => {
-            console.log('account search!');
-
-            if (typeof value === 'string') {
-                console.log('to search');
-                const where = new AppDataFilterWhere();
-                where.search = value;
-                this.dataFilter.where = where;
-
-                this.filterChange.next(this.dataFilter);
-            }
-
-        });
     }
 
 
