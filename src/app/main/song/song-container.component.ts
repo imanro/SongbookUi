@@ -16,6 +16,8 @@ import {SbFormErrors} from '../../shared/models/form-errors.model';
 import {SbSongContent} from '../../shared/models/song-content.model';
 import {SbSongContentRepository} from '../../shared/repositories/content.repository';
 import {SbUser} from '../../shared/models/user.model';
+import {SbSongService} from '../../shared/services/song.service';
+import {AppDataFilterWhere} from '../../shared/models/data-filter-where.model';
 
 @Component({
     selector: 'sb-song-container',
@@ -58,6 +60,7 @@ export class SbSongContainerComponent implements OnInit {
         private appConfig: AppConfig,
         private location: Location,
         private songRepository: SbSongRepository,
+        private songService: SbSongService,
         private tagRepository: SbTagRepository,
         private contentRepository: SbSongContentRepository,
         private activatedRoute: ActivatedRoute
@@ -79,39 +82,41 @@ export class SbSongContainerComponent implements OnInit {
         this.assignCurrentUser();
     }
 
+    get songListSearchText() {
+        return this.songsListDataFilter.where && this.songsListDataFilter.where.search ? this.songsListDataFilter.where.search : '';
+    }
+
     assignCurrentUser(): void {
         this.user = new SbUser();
         this.user.id = 1;
     }
 
-    handleSongsListFilterChange(dataFilter: AppDataFilter): void {
-        const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
+    handleSongTextSearch(value: string): void {
+        const where = new AppDataFilterWhere();
+        where.search = value;
+        this.songsListDataFilter.where = where;
 
-        if (!whereEq) {
-            dataFilter.offset = 0;
-        }
-
-        this.setSongsListDataFilter(dataFilter);
-
-        this.isLoading = true;
-
-        this.fetchSongs()
-            .pipe(finalize(() => {
-                this.isLoading = false;
-            }))
-            .subscribe(() => {
-                }
-            );
+        this.changeDataFilter(this.songsListDataFilter);
     }
 
-    handleTagSearch(dataFilter: AppDataFilter): void {
-        this.setTagsListDataFilter(dataFilter);
-        this.fetchTags()
-            .pipe(finalize(() => {
-            }))
-            .subscribe(() => {
-                }
-            );
+    handleSongListFilterChange(dataFilter: AppDataFilter): void {
+        this.changeDataFilter(dataFilter);
+    }
+
+    handleTagSearch(searchString: string): void {
+        if (this.currentSong) {
+            const filter = this.songService.createTagSearchDataFilterBySong(searchString, this.currentSong);
+
+            this.setTagsListDataFilter(filter);
+            this.fetchTags()
+                .pipe(finalize(() => {
+                }))
+                .subscribe(() => {
+                    }
+                );
+        } else {
+            console.log('Song is null, not emitting the search');
+        }
     }
 
     handleTagAttach(tag: SbTag): void {
@@ -129,15 +134,12 @@ export class SbSongContainerComponent implements OnInit {
         if (!this.currentSong) {
             console.error('The current song is not set, unable to dettach the tag');
         } else {
+            console.log('attemt to detach', tag);
             this.songRepository.detachTagFromSong(tag, this.currentSong).subscribe(sbSong => {
                 // set current song + search new tags list
                 this.setCurrentSong(sbSong);
             });
         }
-    }
-
-    handleTagRemove(tag: SbTag): void {
-
     }
 
     handleTagCreateAndAttach(obj: TagCreateAttachModel): void {
@@ -206,7 +208,7 @@ export class SbSongContainerComponent implements OnInit {
 
         this.contentRepository.delete(content)
             .pipe(
-                tap((r) => console.log("executed", r)),
+                tap((r) => console.log('executed', r)),
                 finalize(() => {
                     this.isLoading = false;
                 }),
@@ -214,6 +216,26 @@ export class SbSongContainerComponent implements OnInit {
             ).subscribe(song => {
                 this.currentSong = song;
         });
+    }
+
+    private changeDataFilter(dataFilter: AppDataFilter): void {
+        const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
+
+        if (!whereEq) {
+            dataFilter.offset = 0;
+        }
+
+        this.setSongsListDataFilter(dataFilter);
+
+        this.isLoading = true;
+
+        this.fetchSongs()
+            .pipe(finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(() => {
+                }
+            );
     }
 
     private refreshCurrentSong(): Observable<SbSong | null> {
@@ -241,8 +263,7 @@ export class SbSongContainerComponent implements OnInit {
     private setCurrentSong(song: SbSong): void {
         this.currentSong = song;
 
-        const filter = this.songRepository.createDataFilter();
-        this.songRepository.buildTagSearchDataFilterBySong(filter, '', song);
+        const filter = this.songService.createTagSearchDataFilterBySong('', song);
         this.setTagsListDataFilter(filter);
         this.fetchTags().subscribe(() => {});
     }

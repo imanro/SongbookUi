@@ -1,0 +1,29 @@
+<div fxLayout="row wrap" fxLayoutAlign="start center" class="tags-editor">
+    <mat-form-field class="tag-list" fxFlex="100">
+        <mat-chip-list #chipList aria-label="Fruit selection" (keyup)="handleTagSearch($event)">
+            <mat-chip
+                *ngFor="let tag of song.tags"
+                [selectable]="true"
+                [removable]="true"
+                (removed)="handleTagDetach(tag)"
+            >
+                {{tag.title}}
+                <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+            <input
+                placeholder="{{title}}"
+                #tagInput
+                [formControl]="tagCtrl"
+                [matAutocomplete]="auto"
+                [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                [matChipInputAddOnBlur]="false"
+                (matChipInputTokenEnd)="handleTagCreate($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleTagAttach($event)">
+            <mat-option *ngFor="let tag of foundTags" [value]="tag">
+                {{tag.title}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+</div>

@@ -1,22 +1,28 @@
 <div class="page-layout simple fullwidth song-list">
     <div class="content p-24">
-        <div *ngIf="isLoading" class="progress-bar-container">
-            <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'"></mat-progress-bar>
-        </div>
-
         <div class="mat-card mat-elevation-z4">
+            <div class="progress-bar-container">
+                <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
+            </div>
             <div class="toolbar p-12" *ngIf="isToolbarShown">
                 <button class="mat-button mat-icon-button">
                     <mat-icon class="secondary-text" aria-hidden="false" aria-label="Example home icon" (click)="handleNavigateBack()">arrow_back</mat-icon>
                 </button>
             </div>
-            <sb-song-list [songs]="songs"
-                          [songsCount]="songsCount"
-                          [dataFilter]="songsListDataFilter"
-                          (filterChange)="handleSongsListFilterChange($event)"
-                          (songSelect)="handleSongSelect($event)"
-                          *ngIf="view === viewNameEnum.SONG_LIST"
-            ></sb-song-list>
+
+            <ng-container *ngIf="view === viewNameEnum.SONG_LIST">
+                <sb-song-text-search
+                    [searchText]="songListSearchText"
+                    (songTextSearch)="handleSongTextSearch($event)"
+                ></sb-song-text-search>
+                <sb-song-list [songs]="songs"
+                              [songsCount]="songsCount"
+                              [dataFilter]="songsListDataFilter"
+                              (filterChange)="handleSongListFilterChange($event)"
+                              (songSelect)="handleSongSelect($event)"
+                              *ngIf="view === viewNameEnum.SONG_LIST"
+                ></sb-song-list>
+            </ng-container>
 
             <sb-song-view
                 [song]="currentSong"

@@ -1,10 +1,4 @@
-<div class="filter-cont px-20" [formGroup]="songSearchForm">
-        <mat-form-field appearance="standard" fxFlex="1 1 500px">
-            <input matInput #filter placeholder="Search for songs" formControlName="filter" autocomplete="off">
-        </mat-form-field>
-</div>
-
-    <mat-table [dataSource]="songs">
+ <mat-table [dataSource]="songs">
         <!-- Position Column -->
         <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef fxFlex="0 0 100px"> Id </mat-header-cell>

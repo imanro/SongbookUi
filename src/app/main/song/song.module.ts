@@ -20,6 +20,8 @@ import { SongContentVideoFrameDirective } from './song-content-list-video/song-c
 import { SbSongContentVideoAddComponent } from './song-content-add-video/song-content-video-add.component';
 import { SongHeaderComponent } from './song-header/song-header.component';
 import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
+import { SongTagListComponent } from './song-tag-list/song-tag-list.component';
+import { SongTextSearchComponent } from './song-text-search/song-text-search.component';
 
 @NgModule({
     declarations: [
@@ -29,7 +31,9 @@ import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
         SbSongContentListVideoComponent,
         SongContentVideoFrameDirective,
         SbSongContentVideoAddComponent,
-        SongHeaderComponent
+        SongHeaderComponent,
+        SongTagListComponent,
+        SongTextSearchComponent
     ],
     imports     : [
         SbSongRoutingModule,

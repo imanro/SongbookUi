@@ -73,6 +73,18 @@
                     }
                 }
             }
+
+            > .content {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                overflow: auto;
+                place-content: stretch;
+
+                .mat-card {
+                    flex: 1 0 auto;
+                }
+            }
         }
     }
 }

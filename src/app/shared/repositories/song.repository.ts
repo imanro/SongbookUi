@@ -66,65 +66,15 @@ export abstract class SbSongRepository extends SbBaseRepository {
     }
 
     detachTagFromSong(tag: SbTag, song: SbSong): Observable<SbSong> {
-        const d = this.appConfig.mockDelayMs;
 
-        return new Observable<SbSong>(observer => {
-
-            if (!song.tags) {
-                song.tags = [];
-                observer.next(song);
-                observer.complete();
-            }
-
-            let foundIndex = null;
-            for (const index in song.tags) {
-                if (song.tags.hasOwnProperty(index)) {
-                    const sTag = song.tags[index];
-
-                    if (sTag.id === tag.id) {
-                        foundIndex = index;
-                    }
-                }
-            }
-
-            if (foundIndex !== null) {
-                song.tags.splice(foundIndex, 1);
-            }
-
-
-            observer.next(song);
-            observer.complete();
-
-        }).pipe(
-            delay(d)
+        const url = this.getApiUrl('/song/' + song.id + '/tags/' + tag.id);
+        return this.http.delete(url).pipe(
+            catchError(this.handleHttpError<SbSong>())
         );
     }
 
     private mapDataToSong(row: any): SbSong {
         const mapper = new SbSongMapper();
         return mapper.mapToEntity(row);
-    }
-
-
-    buildTagSearchDataFilterBySong(filter: AppDataFilter, searchString: string, song: SbSong): void {
-        const where = new AppDataFilterWhere();
-
-        if (searchString.length > 1) {
-            where.addField('title', searchString, AppDataFilterWhereFieldOpEnum.OP_LIKE);
-        }
-
-        if (song.tags) {
-            const ids = [];
-            for (const tag of song.tags) {
-                ids.push(tag.id);
-            }
-
-            if (ids.length > 0) {
-                where.addField('id', ids, 'nin');
-            }
-        }
-
-
-        filter.where = where;
     }
 }

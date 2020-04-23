@@ -38,9 +38,7 @@ export class SbSongListComponent implements OnInit {
     private unsubscribe$ = new Subject<void>();
 
     constructor(
-        private fb: FormBuilder
     ) {
-        this.buildSongSearchForm();
     }
 
     ngOnInit(): void {
@@ -56,12 +54,6 @@ export class SbSongListComponent implements OnInit {
 
     handleSongSelect(song: SbSong): void {
         this.songSelect.next(song);
-    }
-
-    private buildSongSearchForm(): void {
-        this.songSearchForm = this.fb.group({
-            filter: [''],
-        });
     }
 
     private setSongSearchFormValues(): void {
