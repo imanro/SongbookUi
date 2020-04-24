@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {SbSong} from '../../../shared/models/song.model';
+import {SbSong} from '../../../models/song.model';
 
 @Component({
     selector: 'sb-song-text-search',

@@ -13,6 +13,12 @@ const appRoutes: Routes = [
         component: SbFullLayoutComponent,
         loadChildren: './main/song/song.module#SbSongModule'
     },
+    {
+        path: 'concert',
+        component: SbFullLayoutComponent,
+        loadChildren: './main/concert/concert.module#SbConcertModule'
+    },
+
 ];
 
 @NgModule({

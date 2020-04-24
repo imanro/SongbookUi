@@ -12,28 +12,25 @@ import {
     MatTableModule, MatIconModule, MatAutocompleteModule,
     MatButtonModule
 } from '@angular/material';
-import { SbSongListComponent } from './song-list/song-list.component';
+
 import { SbSongViewComponent } from './song-view/song-view.component';
 import { SbSongContainerComponent } from './song-container.component';
 import { SbSongContentListVideoComponent } from './song-content-list-video/song-content-list-video.component';
 import { SongContentVideoFrameDirective } from './song-content-list-video/song-content-video-frame.directive';
 import { SbSongContentVideoAddComponent } from './song-content-add-video/song-content-video-add.component';
-import { SongHeaderComponent } from './song-header/song-header.component';
 import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
-import { SongTagListComponent } from './song-tag-list/song-tag-list.component';
-import { SongTextSearchComponent } from './song-text-search/song-text-search.component';
+import {SongListModule} from '../../shared/modules/song-list/song-list.module';
+import {SongTextSearchModule} from '../../shared/modules/song-text-search/song-text-search.module';
+import {SongTagListModule} from '../../shared/modules/song-tag-list/song-tag-list.module';
+import {SongHeaderModule} from '../../shared/modules/song-header/song-header.module';
 
 @NgModule({
     declarations: [
         SbSongContainerComponent,
-        SbSongListComponent,
         SbSongViewComponent,
         SbSongContentListVideoComponent,
         SongContentVideoFrameDirective,
         SbSongContentVideoAddComponent,
-        SongHeaderComponent,
-        SongTagListComponent,
-        SongTextSearchComponent
     ],
     imports     : [
         SbSongRoutingModule,
@@ -48,7 +45,11 @@ import { SongTextSearchComponent } from './song-text-search/song-text-search.com
         MatChipsModule,
         MatTabsModule,
         MatButtonModule,
-        SbUiUtilsModule
+        SbUiUtilsModule,
+        SongListModule,
+        SongHeaderModule,
+        SongTextSearchModule,
+        SongTagListModule
     ]
 })
 

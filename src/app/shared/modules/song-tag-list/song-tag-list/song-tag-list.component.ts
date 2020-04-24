@@ -1,8 +1,8 @@
 import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {SbSong} from '../../../shared/models/song.model';
+import {SbSong} from '../../../models/song.model';
 import {MatAutocompleteSelectedEvent} from '@angular/material';
-import {SbTag} from '../../../shared/models/tag.model';
-import {TagCreateAttachModel} from '../../../shared/models/tag-create-attach.model';
+import {SbTag} from '../../../models/tag.model';
+import {TagCreateAttachModel} from '../../../models/tag-create-attach.model';
 import {FormControl} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Subject} from 'rxjs';
@@ -53,7 +53,7 @@ export class SongTagListComponent implements OnInit, OnDestroy {
     }
 
     get inputTitle(): string {
-        return this.tags.length == 0 ? this.title : '';
+        return this.tags.length === 0 ? this.title : '';
     }
 
     handleTagCreate($chipEvent: any): void {

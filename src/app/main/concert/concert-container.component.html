@@ -1,0 +1,55 @@
+<div class="page-layout simple fullwidth song-list">
+    <div class="content p-24">
+        <div class="mat-card mat-elevation-z4">
+            <div class="progress-bar-container">
+                <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
+            </div>
+            <div class="page-columns">
+                <div class="concert-container" fxFlex="3 1 auto">
+                    <div class="search-container px-20">
+                        <sb-song-text-search
+                            [searchText]="songListSearchText"
+                            [title]="'Search songs by title'"
+                            [foundSongs]="songs"
+                            (songTextSearch)="handleSongTextSearch($event)"
+                            (songSelect)="handleSongSelect($event)"
+                            fxFlex="1 0 auto"
+                            class="pr-8"
+                        ></sb-song-text-search>
+                    </div>
+
+                    <div class="song-container px-20" *ngIf="operateSong" fxLayoutAlign="start center">
+                        <sb-song-header
+                            [song]="operateSong"
+                            fxFlex="1 0 auto"
+                        ></sb-song-header>
+                        <div class="song-controls"
+                             fxFlex="2 0 auto"
+                        >
+                            <button mat-flat-button color="primary">Add Into Performance</button>
+                        </div>
+
+<!-- + song tags  -->
+                    </div>
+
+                    <div class="concert-container px-20" fxFlexAlign="column">
+                        <sb-concert-summary
+                            [concert]="operateConcert"
+                        ></sb-concert-summary>
+                        <div class="concert-controls">
+                            <button mat-flat-button color="accent">New Performance</button>
+                            <button mat-stroked-button color="primary">Group</button>
+                            <button mat-stroked-button color="primary">Ungroup</button>
+                            <button mat-flat-button color="primary">Go to Files</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="suggest-container" fxFlex="1 1 auto">
+                    suggest
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

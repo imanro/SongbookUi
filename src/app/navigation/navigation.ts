@@ -29,6 +29,13 @@ export const navigation: FuseNavigation[] = [
                 type     : 'item',
                 icon     : 'music_note',
                 url      : '/song'
+            },
+            {
+                id       : 'concert',
+                title    : 'Performance',
+                type     : 'item',
+                icon     : 'music_note',
+                url      : '/concert'
             }
         ]
     }

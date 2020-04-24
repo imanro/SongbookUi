@@ -1,8 +1,8 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {SbSong} from '../../../shared/models/song.model';
-import {AppDataFilter} from '../../../shared/models/data-filter.model';
+import {SbSong} from '../../../models/song.model';
+import {AppDataFilter} from '../../../models/data-filter.model';
 import {PageEvent} from '@angular/material';
-import {SbTag} from '../../../shared/models/tag.model';
+import {SbTag} from '../../../models/tag.model';
 
 @Component({
     selector: 'sb-song-list',

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {SbSong} from '../../../shared/models/song.model';
+import {SbSong} from '../../../models/song.model';
 
 @Component({
     selector: 'sb-song-header',
