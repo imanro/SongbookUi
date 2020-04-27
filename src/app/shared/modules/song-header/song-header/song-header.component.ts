@@ -1,34 +1,35 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {SbSong} from '../../../models/song.model';
+import {SbSongService} from '../../../services/song.service';
 
 @Component({
     selector: 'sb-song-header',
     templateUrl: './song-header.component.html',
     styleUrls: ['./song-header.component.scss']
 })
-export class SongHeaderComponent implements OnInit {
+export class SongHeaderComponent implements OnInit, OnChanges {
 
     @Input()
     song: SbSong;
 
-    constructor() {
+    constructor(
+        private songService: SbSongService
+    ) {
     }
 
     ngOnInit(): void {
     }
 
-    getHeadersString(): string {
-        if (this.song.headers) {
-            const array = [];
-            for (const header of this.song.headers) {
-                array.push(header.content);
-            }
+    ngOnChanges(changes: SimpleChanges): void {
+        console.log('The song now is', this.song);
+    }
 
-            return array.join(', ');
+    get songHeader(): string {
+        return this.songService.getSongFavoriteHeader(this.song);
+    }
 
-        } else {
-            return '';
-        }
+    get allSongHeadersString(): string {
+        return this.songService.getSongAllHeadersString(this.song);
     }
 
 

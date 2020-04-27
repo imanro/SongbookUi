@@ -7,10 +7,17 @@ import {Observable} from 'rxjs';
 import {SbSongRepository} from '../../shared/repositories/song.repository';
 import {SbSong} from '../../shared/models/song.model';
 import {SbTagRepository} from '../../shared/repositories/tag.repository';
-import * as _ from 'lodash';
+import {cloneDeep} from 'lodash';
+import * as moment from 'moment';
 import {AppConfig} from '../../app.config';
 import {SbConcertRepository} from '../../shared/repositories/concert.repository';
 import {SbConcert} from '../../shared/models/concert.model';
+import {SbConcertItem} from '../../shared/models/concert-item.model';
+import {AppApiResult} from '../../shared/models/api-result.model';
+import {SbPopularItem} from '../../shared/models/popular-item.model';
+import {SbSongService} from '../../shared/services/song.service';
+import {SbSuggestItem} from '../../shared/models/suggest-item.model';
+import {SbUser} from '../../shared/models/user.model';
 
 @Component({
     selector: 'sb-concert-container',
@@ -21,73 +28,75 @@ export class SbConcertContainerComponent implements OnInit {
 
     isLoading = false;
 
-    songsListDataFilter: AppDataFilter;
+    suggestSongSearchTags: SbTag[];
 
-    songListSearchTags: SbTag[];
+    suggestSongsSearchTagsFoundTags: SbTag[];
 
-    foundSongListSearchTags: SbTag[];
+    suggestSongsSearchTagsFoundSongsResult: AppApiResult<SbSong>;
+
+    suggestSongsSearchTagsDataFilter: AppDataFilter;
+
+    suggestSongsSearchTagsFormatter: (item: any, position: number) => string;
+
+    suggestSongsPopularDataFilter: AppDataFilter;
+
+    suggestSongsPopularFoundSongsResult: AppApiResult<SbPopularItem>;
+
+    suggestSongsPopularFoundPlayInterval: any = null;
+
+    suggestSongsPopularFormatter: (item: any, position: number) => string;
 
     tagsListDataFilter: AppDataFilter;
 
-    songsListDataFilterPrevInstance: AppDataFilter;
-
-    songs: SbSong[] = [];
+    foundTextSearchSongs: SbSong[] = [];
 
     operateSong: SbSong;
 
     operateConcert: SbConcert;
 
+    isConcertAddFormShown = false;
+
+    concertAdd: SbConcert;
+
+    user: SbUser;
+
     constructor(
         private appConfig: AppConfig,
         private songRepository: SbSongRepository,
         private tagRepository: SbTagRepository,
-        private concertRepository: SbConcertRepository
+        private concertRepository: SbConcertRepository,
+        private songService: SbSongService
     ) {
     }
 
     ngOnInit(): void {
-        this.setSongsListDataFilter(this.createDataFilter());
-        this.songListSearchTags = [];
-        this.processRouteParams();
-    }
+        this.suggestSongSearchTags = [];
+        this.fetchTags(new AppDataFilter()).subscribe(result => {
+            this.suggestSongsSearchTagsFoundTags = result.rows;
+        });
 
-    get songListSearchText(): string {
-        return this.songsListDataFilter.where && this.songsListDataFilter.where.search ? this.songsListDataFilter.where.search : '';
+        this.processRouteParams();
+
+        this.assignCurrentUser();
+
+        this.initSuggestSongsSearchTags();
+        this.initSuggestSongsPopular();
+        this.initNewConcert();
     }
 
     handleSongTextSearch(value: string): void {
-        const where = new AppDataFilterWhere();
-        where.search = value;
-        this.songsListDataFilter.where = where;
+        const dataFilter = this.createDataFilter();
+        dataFilter.where.search = value;
+        dataFilter.limit = this.appConfig.listRowsLimit;
 
-        this.changeDataFilter(this.songsListDataFilter);
-    }
+        this.isLoading = true;
 
-    handleSongListSearchTagAdd(tag: SbTag): void {
-
-        if (this.songListSearchTags.find(curTag => curTag.id === tag.id) === undefined) {
-            this.songListSearchTags.push(tag);
-
-            this.isLoading = true;
-
-            this.fetchSongs()
-                .pipe(finalize(() => {
-                    this.isLoading = false;
-                }))
-                .subscribe(() => {
-                    }
-                );
-        }
-    }
-
-    handleSongListSearchTagRemove(tag: SbTag): void {
-        this.songListSearchTags = this.songListSearchTags.filter(curTag => curTag.id !== tag.id);
-
-        this.fetchSongs()
+        this.fetchSongsByTags(dataFilter)
             .pipe(finalize(() => {
                 this.isLoading = false;
             }))
-            .subscribe(() => {
+            .subscribe(apiResult => {
+                    this.foundTextSearchSongs = apiResult.rows;
                 }
             );
     }
@@ -101,91 +110,256 @@ export class SbConcertContainerComponent implements OnInit {
         this.fetchTags(filter)
             .pipe(finalize(() => {
             }))
-            .subscribe(tags => {
-                    this.foundSongListSearchTags = tags;
+            .subscribe(result => {
+                    this.suggestSongsSearchTagsFoundTags = result.rows;
                 }
             );
     }
+
+    handleSuggestSongsSearchTagAdd(tag: SbTag): void {
+        if (this.suggestSongSearchTags.find(curTag => curTag.id === tag.id) === undefined) {
+            this.suggestSongSearchTags.push(tag);
+
+            this.suggestSongsSearchTagsDataFilter.limit = this.appConfig.suggestListRowsLimit;
+            this.suggestSongsSearchTagsDataFilter.offset = 0;
+
+            this.fetchSongsByTags(this.suggestSongsSearchTagsDataFilter, this.suggestSongSearchTags)
+                .subscribe(apiResult => {
+                        this.suggestSongsSearchTagsFoundSongsResult = apiResult;
+                    }
+                );
+        }
+    }
+
+    handleSuggestSongsSearchTagRemove(tag: SbTag): void {
+        this.suggestSongSearchTags = this.suggestSongSearchTags.filter(curTag => curTag.id !== tag.id);
+
+        if (this.suggestSongSearchTags.length > 0) {
+
+            this.suggestSongsSearchTagsDataFilter.limit = this.appConfig.suggestListRowsLimit;
+            this.suggestSongsSearchTagsDataFilter.offset = 0;
+
+            this.fetchSongsByTags(this.suggestSongsSearchTagsDataFilter, this.suggestSongSearchTags)
+                .subscribe(apiResult => {
+                        this.suggestSongsSearchTagsFoundSongsResult = apiResult;
+                    }
+                );
+        } else {
+            this.suggestSongsSearchTagsFoundSongsResult = null;
+        }
+    }
+
+    handleSuggestSongsSearchTagsDataFilterChange(filter: AppDataFilter): void {
+        this.suggestSongsSearchTagsDataFilter = cloneDeep(filter);
+
+        this.fetchSongsByTags(this.suggestSongsSearchTagsDataFilter, this.suggestSongSearchTags)
+            .subscribe(apiResult => {
+                    this.suggestSongsSearchTagsFoundSongsResult = apiResult;
+                }
+            );
+    }
+
+    handleSuggestSongsPopularDataFilterChange(filter: AppDataFilter): void {
+        this.suggestSongsPopularDataFilter = cloneDeep(filter);
+
+        if (this.suggestSongsPopularDataFilter.offset >= this.appConfig.suggestSongsPopularResetLimit) {
+            this.suggestSongsPopularDataFilter.offset = 0;
+        }
+
+        this.suggestSongsPopularAutoPlayStop();
+
+        this.fetchSongsPopular(this.suggestSongsPopularDataFilter)
+            .subscribe(result => {
+                this.suggestSongsPopularFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsPopularAutoPlayStateChange(): void {
+        this.suggestSongsPopularAutoPlayToggle();
+    }
+
 
     handleSongSelect(song: SbSong): void {
         this.operateSong = song;
     }
 
+    handleSuggestItemSelect(item: SbSuggestItem): void {
+        this.operateSong = item.song;
+    }
+
+    handleConcertItemSelect(concertItem: SbConcertItem): void {
+        // do nothing so far
+    }
+
+    handleAddSongToConcert(song: SbSong, concert: SbConcert): void {
+        if (song && concert) {
+            this.isLoading = true;
+            const concertItem = this.concertRepository.createConcertItem();
+            concertItem.song = song;
+            concertItem.concert = concert;
+
+            this.concertRepository.saveConcertItem(concertItem)
+                .pipe(
+                    finalize(() => {
+                        this.isLoading = false;
+                    })
+                )
+                .subscribe(() => {
+                // re-read concert
+                this.fetchConcert(concert.id);
+            });
+        }
+    }
+
+    handleDeleteConcertItem(concertItem: SbConcertItem): void {
+        this.isLoading = true;
+        this.concertRepository.deleteConcertItem(concertItem)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            )
+            .subscribe(() => {
+            // re-read concert
+            if (this.operateConcert) {
+                this.fetchConcert(this.operateConcert.id);
+            }
+        });
+    }
+
+    handleConcertAddFormToggle(): void {
+        this.isConcertAddFormShown = !this.isConcertAddFormShown;
+    }
+
+    handleConcertAdd(concert: SbConcert): void {
+        console.log('To add:', concert);
+
+        concert.user = this.user;
+        this.isLoading = true;
+
+        this.concertRepository.save(concert)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            ).subscribe(addedConcert => {
+            console.log('added concert:', addedConcert);
+            this.operateConcert = addedConcert;
+            this.isConcertAddFormShown = false;
+        });
+    }
+
     private processRouteParams(): void {
         // temporary assign last concert; in future - process concert id url param
+        this.fetchLastConcert();
+    }
+
+    private assignCurrentUser(): void {
+        this.user = new SbUser();
+        this.user.id = 1;
+    }
+
+    private initSuggestSongsSearchTags(): void {
+        this.suggestSongsSearchTagsDataFilter = this.songRepository.createDataFilter();
+        this.suggestSongsSearchTagsDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsSearchTagsDataFilter.offset = 0;
+
+        this.suggestSongsSearchTagsFormatter = (item: SbSong, position: number) => {
+            return position + '. ' + this.songService.getSongFavoriteHeader(item);
+        };
+    }
+
+    private initSuggestSongsPopular(): void {
+        this.suggestSongsPopularDataFilter = this.songRepository.createDataFilter();
+
+        this.suggestSongsPopularDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsPopularDataFilter.offset = 0;
+
+        this.fetchSongsPopular(this.suggestSongsPopularDataFilter)
+            .subscribe(result => {
+                this.suggestSongsPopularFoundSongsResult = result;
+            });
+
+        this.suggestSongsPopularFormatter = (item: SbPopularItem, position: number) => {
+            return position + '. ' + this.songService.getSongFavoriteHeader(item.song) +
+                ' <span class="total">' + item.total + '</span>' +
+                (item.lastConcert ? ' <span class="performance-time">' + moment(item.lastConcert.time).format('D.MM.YYYY') + '</span>' : '');
+        };
+
+        // run autoplay
+        this.suggestSongsPopularAutoPlayStart();
+    }
+
+    private initNewConcert(): void {
+        this.concertAdd = new SbConcert();
+
+        const curDate = new Date();
+        const datePlus = 7 - curDate.getDay();
+
+        // 9:00 AM by default :)
+        this.concertAdd.time = new Date(curDate.getFullYear(), curDate.getMonth(), curDate.getDate() + datePlus, 9);
+    }
+
+    private suggestSongsPopularAutoPlayToggle(): void {
+        if (!!this.suggestSongsPopularFoundPlayInterval) {
+            this.suggestSongsPopularAutoPlayStop();
+        } else {
+            console.log('restart');
+            this.suggestSongsPopularAutoPlayStart();
+        }
+    }
+
+    private suggestSongsPopularAutoPlayStart(): void {
+        this.suggestSongsPopularFoundPlayInterval = window.setInterval(() => {
+
+            if (this.suggestSongsPopularDataFilter.offset + this.appConfig.suggestListRowsLimit >= this.appConfig.suggestSongsPopularResetLimit) {
+                this.suggestSongsPopularDataFilter.offset = 0;
+            } else {
+                this.suggestSongsPopularDataFilter.offset += this.appConfig.suggestListRowsLimit;
+            }
+
+            this.fetchSongsPopular(this.suggestSongsPopularDataFilter)
+                .subscribe(result => {
+                    this.suggestSongsPopularFoundSongsResult = result;
+                });
+
+        }, this.appConfig.suggestListIntervalMs);
+    }
+
+    private suggestSongsPopularAutoPlayStop(): void {
+        window.clearInterval(this.suggestSongsPopularFoundPlayInterval);
+        this.suggestSongsPopularFoundPlayInterval = null;
+    }
+
+    private fetchConcert(id: number): void {
+        this.concertRepository.findConcert(id).subscribe(concert => {
+            this.operateConcert = concert;
+        });
+    }
+
+    private fetchLastConcert(): void {
         this.concertRepository.findLastConcert().subscribe(concert => {
             this.operateConcert = concert;
         });
     }
 
-    private changeDataFilter(dataFilter: AppDataFilter): void {
-        const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
-
-        if (!whereEq) {
-            dataFilter.offset = 0;
-        }
-
-        this.setSongsListDataFilter(dataFilter);
-
-        this.isLoading = true;
-
-        this.fetchSongs()
-            .pipe(finalize(() => {
-                this.isLoading = false;
-            }))
-            .subscribe(() => {
-                }
-            );
+    private fetchSongsByTags(filter: AppDataFilter, tags: SbTag[] = []): Observable<AppApiResult<SbSong>> {
+        return this.songRepository.findSongsByTags(tags, filter);
     }
 
-    private setSongsListDataFilter(dataFilter: AppDataFilter): void {
-
-        if (this.songsListDataFilter) {
-            console.log('set from p', JSON.stringify(this.songsListDataFilter));
-            this.songsListDataFilterPrevInstance = _.cloneDeep(this.songsListDataFilter);
-        } else {
-            this.songsListDataFilterPrevInstance = _.cloneDeep(dataFilter);
-        }
-
-        console.log('ssldf', JSON.stringify(dataFilter), JSON.stringify(this.songsListDataFilterPrevInstance));
-
-        this.songsListDataFilter = dataFilter;
+    private fetchSongsPopular(filter: AppDataFilter): Observable<AppApiResult<SbPopularItem>> {
+        return this.songRepository.findSongsPopular(filter);
     }
 
-    private fetchSongs(): Observable<void> {
-
-        return new Observable<void>(observer => {
-            this.songRepository.findSongsByTags(this.songListSearchTags, this.songsListDataFilter).subscribe(result => {
-                this.songs = result.rows;
-                observer.complete();
-
-            }, err => {
-                console.error('An error occurred:', err);
-                observer.complete();
-            });
-        });
-
-    }
-
-    private fetchTags(tagListDataFilter: AppDataFilter): Observable<SbTag[]> {
+    private fetchTags(tagListDataFilter: AppDataFilter): Observable<AppApiResult<SbTag>> {
         console.log('Fetch tags by filter', this.tagsListDataFilter);
         tagListDataFilter.limit = 10;
-
-        return new Observable<SbTag[]>(observer => {
-            this.tagRepository.findTags(tagListDataFilter).subscribe(result => {
-                observer.next(result.rows);
-                observer.complete();
-
-            }, err => {
-                console.error('An error occurred:', err);
-                observer.complete();
-            });
-        });
+        return this.tagRepository.findTags(tagListDataFilter);
     }
 
     private createDataFilter(): AppDataFilter {
-        const dataFilter = new AppDataFilter();
-        dataFilter.limit = this.appConfig.listRowsLimit;
+        const dataFilter = this.songRepository.createDataFilter();
+        dataFilter.where = this.songRepository.createDataFilterWhere();
         return dataFilter;
     }
 

@@ -21,9 +21,13 @@ export class SongTagListComponent implements OnInit, OnDestroy {
 
     @Input() title = 'Song tags';
 
+    @Input() isViewMode = false;
+
     @Output() tagSelect = new EventEmitter<SbTag>();
 
     @Output() tagRemove = new EventEmitter<SbTag>();
+
+    @Output() tagPoint = new EventEmitter<SbTag>();
 
     @Output() tagCreate = new EventEmitter<string>();
 
@@ -62,6 +66,10 @@ export class SongTagListComponent implements OnInit, OnDestroy {
         if ($chipEvent.input) {
             $chipEvent.input.value = '';
         }
+
+        if (this.tagInput.nativeElement) {
+            this.tagInput.nativeElement.value = '';
+        }
     }
 
     handleTagAttach(tag: MatAutocompleteSelectedEvent): void {
@@ -71,6 +79,11 @@ export class SongTagListComponent implements OnInit, OnDestroy {
 
     handleTagDetach(tag: SbTag): void {
         this.tagRemove.next(tag);
+    }
+
+    handleTagPoint(tag: SbTag): void {
+        console.log('point!');
+        this.tagPoint.next(tag);
     }
 
     handleTagSearch(e: KeyboardEvent): void {

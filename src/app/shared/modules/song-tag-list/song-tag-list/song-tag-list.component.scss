@@ -1,6 +1,9 @@
 :host {
+    display: block;
+
     mat-chip-list {
         mat-chip {
+            cursor: pointer;
             min-height: 23px;
             margin: 1px 4px;
         }

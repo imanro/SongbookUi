@@ -1,0 +1,41 @@
+@import "variables";
+@import "mixins";
+
+.suggested-songs-block {
+
+    display: block;
+
+    .play-controls {
+        button {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+        }
+    }
+
+    .song-list {
+        background: $sb-item-bg-color;
+        border-radius: 4px;
+
+        .item {
+            display: flex; // because of unequal space using "fxFlex"
+
+
+            .title {
+                @include sb-custom-control();
+                flex: 2 0 100px;
+            }
+
+            .total {
+                font-size: 11px;
+                color: #900;
+            }
+
+            .performance-time {
+                font-size: 11px;
+                color: $sb-secondary-text-color;
+            }
+        }
+    }
+
+}

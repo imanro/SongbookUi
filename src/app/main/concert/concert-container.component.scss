@@ -1,6 +1,15 @@
+@import '../../../styles/variables';
+
 :host {
     .progress-bar-container {
         height: 5px;
+    }
+
+    .song-controls {
+        a {
+            font-weight: 600;
+            color: $sb-link-action-color;
+        }
     }
 
     .concert-controls {
@@ -8,4 +17,32 @@
             margin-right: 5px;
         }
     }
+
+    sb-concert-item-list {
+        max-width: 800px;
+    }
+
+    .concert-add-container {
+        position: relative; // for baloon corner
+
+        sb-concert-add {
+            background: $sb-form-panel-bg-color;
+            border-radius: $sb-form-panel-border-radius;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-bottom-color: $sb-form-panel-bg-color;
+            border-top: 0;
+            margin-left: 65px;
+            margin-top: -10px;
+        }
+    }
+
 }

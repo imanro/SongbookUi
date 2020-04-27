@@ -20,20 +20,20 @@ export class SbSongMapper extends SbBaseEntityMapperAbstract<SbSong> {
         entity.copyright = row.copyright;
 
         entity.headers = [];
-        if (row.headers !== undefined) {
+        if (row.headers) {
             const contentMapper = this.getContentMapper();
             entity.headers = contentMapper.mapToEntitiesList(row.headers);
         }
 
         entity.content = [];
-        if (row.content !== undefined) {
+        if (row.content) {
 
             const contentMapper = this.getContentMapper();
             entity.content = contentMapper.mapToEntitiesList(row.content);
         }
 
         entity.tags = [];
-        if (row.tags !== undefined) {
+        if (row.tags) {
             const tagMapper = this.getTagMapper();
             entity.tags = tagMapper.mapToEntitiesList(row.tags);
         }

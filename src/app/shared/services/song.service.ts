@@ -35,4 +35,22 @@ export class SbSongService {
         filter.where = where;
         return filter;
     }
+
+    getSongFavoriteHeader(song: SbSong): string {
+        return song.headers.length > 0 ? song.headers[0].content : song.title;
+    }
+
+    getSongAllHeadersString(song: SbSong): string {
+        if (song.headers) {
+            const array = [];
+            for (const header of song.headers) {
+                array.push(header.content);
+            }
+
+            return array.join(', ');
+
+        } else {
+            return '';
+        }
+    }
 }

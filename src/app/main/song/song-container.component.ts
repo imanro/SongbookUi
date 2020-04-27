@@ -90,11 +90,6 @@ export class SbSongContainerComponent implements OnInit {
         return this.songsListDataFilter.where && this.songsListDataFilter.where.search ? this.songsListDataFilter.where.search : '';
     }
 
-    assignCurrentUser(): void {
-        this.user = new SbUser();
-        this.user.id = 1;
-    }
-
     handleSongTextSearch(value: string): void {
         const where = new AppDataFilterWhere();
         where.search = value;
@@ -268,7 +263,11 @@ export class SbSongContainerComponent implements OnInit {
                     this.foundSongListSearchTags = tags;
                 }
             );
+    }
 
+    private assignCurrentUser(): void {
+        this.user = new SbUser();
+        this.user.id = 1;
     }
 
     private changeDataFilter(dataFilter: AppDataFilter): void {

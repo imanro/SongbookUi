@@ -6,6 +6,8 @@ import {Observable, throwError} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {AppError} from '../models/error.model';
 import {SbUser} from '../models/user.model';
+import {SbTag} from '../models/tag.model';
+import {AppApiResult} from '../models/api-result.model';
 
 @Injectable()
 export abstract class SbBaseRepository {
@@ -14,7 +16,6 @@ export abstract class SbBaseRepository {
         protected http: HttpClient
     ) {
     }
-
 
     createDataFilter(): AppDataFilter {
         return new AppDataFilter();
@@ -149,6 +150,21 @@ export abstract class SbBaseRepository {
             }),
             params: {}
         };
+    }
+
+    protected createResultFromApiResponse<T>(response: any): AppApiResult<T> {
+        const result = new AppApiResult<T>();
+
+        if (response.totalElements) {
+            result.totalCount = response.totalElements;
+        }
+
+        if (response.pageable) {
+            result.pageNumber = response.pageable.pageNumber;
+            result.pageSize = response.pageable.pageSize;
+        }
+
+        return result;
     }
 
     protected getDefaultUser() {

@@ -1,0 +1,41 @@
+@import 'src/styles/variables';
+@import 'src/styles/mixins';
+
+:host {
+    display: block;
+
+    .item {
+        display: flex; // because of unequal space using "fxFlex"
+        border-radius: 4px;
+        background: $sb-item-bg-color;
+
+        .title {
+            @include sb-custom-control();
+            flex: 2 0 100px;
+        }
+
+        .actions {
+            flex: 1 0 100px;
+            display: flex;
+            place-content: flex-end;
+
+            mat-icon {
+                display: flex;
+                flex: 0 0 auto;
+
+                @include sb-custom-control();
+                color: $sb-icon-action-color;
+                font-size: 18px;
+                line-height: 17px;
+                min-height: 17px;
+                height: 17px;
+
+                &.draggable {
+                    cursor: move;
+                    cursor: grab;
+                }
+            }
+        }
+    }
+
+}

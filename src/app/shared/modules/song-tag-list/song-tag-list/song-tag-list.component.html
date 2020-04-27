@@ -1,15 +1,17 @@
-<div fxLayout="row wrap" fxLayoutAlign="start center" class="tags-editor">
+<div fxLayout="row wrap" fxLayoutAlign="start center" class="tags-editor" *ngIf="!isViewMode; else viewModeBlock">
     <mat-form-field class="tag-list" appearance="standard"  fxFlex="1 1 auto">
         <mat-chip-list #chipList aria-label="Tag search" (keyup)="handleTagSearch($event)">
-            <mat-chip
-                *ngFor="let tag of tags"
-                [selectable]="true"
-                [removable]="true"
-                (removed)="handleTagDetach(tag)"
-            >
-                {{tag.title}}
-                <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
+            <ng-container *ngIf="tags && tags.length > 0">
+                <mat-chip
+                    *ngFor="let tag of tags"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="handleTagDetach(tag)"
+                >
+                    {{tag.title}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+            </ng-container>
             <input
                 placeholder="{{inputTitle}}"
                 #tagInput
@@ -21,9 +23,24 @@
                 (matChipInputTokenEnd)="handleTagCreate($event)">
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="handleTagAttach($event)">
-            <mat-option *ngFor="let tag of foundTags" [value]="tag">
-                {{tag.title}}
-            </mat-option>
+            <ng-container *ngIf="foundTags">
+                <mat-option *ngFor="let tag of foundTags" [value]="tag">
+                    {{tag.title}}
+                </mat-option>
+            </ng-container>
         </mat-autocomplete>
     </mat-form-field>
 </div>
+<ng-template #viewModeBlock>
+    <ng-container *ngIf="tags">
+        <mat-chip-list>
+            <mat-chip
+                *ngFor="let tag of tags"
+                [selectable]="true"
+                (click)="handleTagPoint(tag)"
+            >
+                {{tag.title}}
+            </mat-chip>
+        </mat-chip-list>
+    </ng-container>
+</ng-template>

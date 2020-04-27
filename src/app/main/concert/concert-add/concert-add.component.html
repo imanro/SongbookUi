@@ -1,0 +1,33 @@
+<form fxLayout="column" fxLayoutAlign="start"
+      fxFlex="1 0 auto" name="form" [formGroup]="concertAddForm" (ngSubmit)="handleContentVideoAdd()">
+
+    <div fxLayoutAlign="start center" fxFlex="1 0 auto" fxLayout="row">
+
+        <div fxFlex="4 0 auto" fxLayout="column">
+            <div>
+                <mat-form-field fxFlex="2 0 auto" class="mr-8"
+                                *ngIf="getContentAddVideoFormControl('time'); let timeInput;">
+                    <mat-label>Performance Time</mat-label>
+                    <input matInput formControlName="time" sbAutofocus [matDatepicker]="picker"
+                           placeholder="Choose a date">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field fxFlex="2 0 auto" class="mr-4"
+                                *ngIf="getContentAddVideoFormControl('time'); let titleInput;">
+                    <mat-label>Title (optional)</mat-label>
+                    <input matInput formControlName="title">
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-checkbox formControlName="isDraft">This is a draft?</mat-checkbox>
+            </div>
+        </div>
+
+        <div fxFlex="1 0 auto" class="pl-4" fxLayout="row">
+            <button type="submit" mat-flat-button color="primary" fxFlex="1 1 100%">Add</button>
+        </div>
+
+    </div>
+</form>

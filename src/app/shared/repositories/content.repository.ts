@@ -26,7 +26,7 @@ export class SbSongContentRepository extends SbBaseRepository {
             );
     }
 
-    delete(entity: SbSongContent): Observable<SbSongContent> {
+    delete(entity: SbSongContent): Observable<any> {
 
         const url = this.getApiUrl('/song-content/' + entity.id);
 

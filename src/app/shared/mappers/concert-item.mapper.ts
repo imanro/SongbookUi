@@ -34,6 +34,11 @@ export class SbConcertItemMapper extends SbBaseEntityMapperAbstract<SbConcertIte
             data.song = {id: entity.song.id};
         }
 
+        if (entity.concert) {
+            data.concert = {id: entity.concert.id};
+        }
+
+
         data.orderValue = entity.orderValue;
 
         return data;

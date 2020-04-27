@@ -25,6 +25,12 @@ export class AppConfig implements IAppConfig {
 
     listRowsLimit = 20;
 
+    suggestListRowsLimit = 10;
+
+    suggestListIntervalMs = 10000;
+
+    suggestSongsPopularResetLimit = 100;
+
     constructor(
         private http: HttpClient
     ) {}

@@ -3,31 +3,46 @@ import {SbBaseRepository} from './base.repository';
 import {AppDataFilter} from '../models/data-filter.model';
 import {Observable} from 'rxjs';
 import {SbSong} from '../models/song.model';
-import {ApiResult} from '../models/api-result.model';
+import {AppApiResult} from '../models/api-result.model';
 import {SbTag} from '../models/tag.model';
 import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../models/data-filter-where.model';
 import {catchError, delay, map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {AppConfig} from '../../app.config';
 import {SbSongMapper} from '../mappers/song.mapper';
+import {SbPopularItemMapper} from '../mappers/popular-item.mapper';
+import {SbPopularItem} from '../models/popular-item.model';
 
 @Injectable({
     providedIn: 'root'
     }
 )
-export abstract class SbSongRepository extends SbBaseRepository {
+export class SbSongRepository extends SbBaseRepository {
 
-    findSongs(filter: AppDataFilter): Observable<ApiResult<SbSong>> {
+    private songMapper: SbSongMapper;
+
+    private popularItemMapper: SbPopularItemMapper;
+
+    findSong(id): Observable<SbSong> {
+        const url = this.getApiUrl('/song/' + id);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, SbSong>(row => {
+                    return this.mapDataToSong(row);
+                })
+            );
+    }
+
+    findSongs(filter: AppDataFilter): Observable<AppApiResult<SbSong>> {
 
         const url = this.getApiUrl('/song', filter);
 
         return this.http.get<SbSong>(url)
             .pipe(
-                map<any, ApiResult<SbSong>>(response => {
+                map<any, AppApiResult<SbSong>>(response => {
 
-                    const result = new ApiResult<SbSong>();
-                    result.rows = [];
-                    result.totalCount = response.totalElements;
+                    const result = this.createResultFromApiResponse<SbSong>(response);
 
                     if (response.content) {
                         for (const row of response.content) {
@@ -41,7 +56,29 @@ export abstract class SbSongRepository extends SbBaseRepository {
             );
     }
 
-    findSongsByTags(tags: SbTag[], filter: AppDataFilter): Observable<ApiResult<SbSong>> {
+    findSongsPopular(filter: AppDataFilter): Observable<AppApiResult<SbPopularItem>> {
+
+        const url = this.getApiUrl('/song-suggest/popular', filter);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, AppApiResult<SbPopularItem>>(response => {
+
+                    const result = this.createResultFromApiResponse<SbPopularItem>(response);
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const item = this.mapDataToPopularItem(row);
+                            result.rows.push(item);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
+    findSongsByTags(tags: SbTag[], filter: AppDataFilter): Observable<AppApiResult<SbSong>> {
         let url;
         if (tags.length > 0) {
             const tagIds = [];
@@ -57,11 +94,9 @@ export abstract class SbSongRepository extends SbBaseRepository {
 
         return this.http.get<SbSong>(url)
             .pipe(
-                map<any, ApiResult<SbSong>>(response => {
+                map<any, AppApiResult<SbSong>>(response => {
 
-                    const result = new ApiResult<SbSong>();
-                    result.rows = [];
-                    result.totalCount = response.totalElements;
+                    const result = this.createResultFromApiResponse<SbSong>(response);
 
                     if (response.content) {
                         for (const row of response.content) {
@@ -71,17 +106,6 @@ export abstract class SbSongRepository extends SbBaseRepository {
                     }
 
                     return result;
-                })
-            );
-    }
-
-    findSong(id): Observable<SbSong> {
-        const url = this.getApiUrl('/song/' + id);
-
-        return this.http.get<SbSong>(url)
-            .pipe(
-                map<any, SbSong>(row => {
-                    return this.mapDataToSong(row);
                 })
             );
     }
@@ -107,8 +131,29 @@ export abstract class SbSongRepository extends SbBaseRepository {
         );
     }
 
+    private getSongMapper(): SbSongMapper {
+        if (!this.songMapper) {
+            this.songMapper = new SbSongMapper();
+        }
+
+        return this.songMapper;
+    }
+
+    private getPopularItemMapper(): SbPopularItemMapper {
+        if (!this.popularItemMapper) {
+            this.popularItemMapper = new SbPopularItemMapper();
+        }
+
+        return this.popularItemMapper;
+    }
+
     private mapDataToSong(row: any): SbSong {
-        const mapper = new SbSongMapper();
+        const mapper = this.getSongMapper();
+        return mapper.mapToEntity(row);
+    }
+
+    private mapDataToPopularItem(row: any): SbPopularItem {
+        const mapper = this.getPopularItemMapper();
         return mapper.mapToEntity(row);
     }
 }

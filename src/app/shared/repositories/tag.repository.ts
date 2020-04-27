@@ -2,7 +2,7 @@ import { Injectable} from '@angular/core';
 import {SbBaseRepository} from './base.repository';
 import {SbTag} from '../models/tag.model';
 import {Observable} from 'rxjs';
-import {ApiResult} from '../models/api-result.model';
+import {AppApiResult} from '../models/api-result.model';
 import {AppDataFilter} from '../models/data-filter.model';
 import {catchError, map} from 'rxjs/operators';
 import {SbTagMapper} from '../mappers/tag.mapper';
@@ -16,13 +16,13 @@ export class SbTagRepository extends SbBaseRepository {
         return new SbTag();
     }
 
-    findTags(filter: AppDataFilter): Observable<ApiResult<SbTag>> {
+    findTags(filter: AppDataFilter): Observable<AppApiResult<SbTag>> {
         const url = this.getApiUrl('/tag', filter);
 
         return this.http.get<SbTag>(url)
             .pipe(
-                map<any, ApiResult<SbTag>>(response => {
-                    const result = new ApiResult<SbTag>();
+                map<any, AppApiResult<SbTag>>(response => {
+                    const result = new AppApiResult<SbTag>();
                     result.rows = [];
                     result.totalCount = response.totalElements;
 

@@ -8,9 +8,9 @@
                 <div class="concert-container" fxFlex="3 1 auto">
                     <div class="search-container px-20">
                         <sb-song-text-search
-                            [searchText]="songListSearchText"
+
                             [title]="'Search songs by title'"
-                            [foundSongs]="songs"
+                            [foundSongs]="foundTextSearchSongs"
                             (songTextSearch)="handleSongTextSearch($event)"
                             (songSelect)="handleSongSelect($event)"
                             fxFlex="1 0 auto"
@@ -18,35 +18,93 @@
                         ></sb-song-text-search>
                     </div>
 
-                    <div class="song-container px-20" *ngIf="operateSong" fxLayoutAlign="start center">
-                        <sb-song-header
-                            [song]="operateSong"
-                            fxFlex="1 0 auto"
-                        ></sb-song-header>
-                        <div class="song-controls"
-                             fxFlex="2 0 auto"
-                        >
-                            <button mat-flat-button color="primary">Add Into Performance</button>
-                        </div>
+                    <div class="song-container px-20 mb-12" *ngIf="operateSong" fxLayoutAlign="start center">
+                        <div fxFlex="1 0 300px" fxLayout="column">
+                            <sb-song-header
+                                [song]="operateSong"
 
-<!-- + song tags  -->
+                            ></sb-song-header>
+                            <sb-song-tag-list
+                                *ngIf="operateSong.tags && operateSong.tags.length > 0"
+                                [tags]="operateSong.tags"
+                                (tagPoint)="handleSuggestSongsSearchTagAdd($event)"
+                                [isViewMode]="true"
+                                class="mt-16"
+                                fxFlex="1 0 auto"
+                            >
+
+                            </sb-song-tag-list>
+                            <div class="song-controls mt-16">
+                                <a [routerLink]="'/song/' + operateSong.id">Go to the Song Page</a>
+                            </div>
+                        </div>
+                        <div class="song-controls"
+                             fxFlex="1 0 auto"
+                        >
+                            <button mat-flat-button color="primary" (click)="handleAddSongToConcert(operateSong, operateConcert)">Add Into Performance</button>
+                        </div>
+                        <!-- + song tags  -->
                     </div>
 
                     <div class="concert-container px-20" fxFlexAlign="column">
                         <sb-concert-summary
                             [concert]="operateConcert"
+                            class="mb-16"
                         ></sb-concert-summary>
-                        <div class="concert-controls">
-                            <button mat-flat-button color="accent">New Performance</button>
+                        <div class="concert-controls mb-12">
+                            <button mat-flat-button color="accent" (click)="handleConcertAddFormToggle()">New Performance</button>
                             <button mat-stroked-button color="primary">Group</button>
                             <button mat-stroked-button color="primary">Ungroup</button>
                             <button mat-flat-button color="primary">Go to Files</button>
                         </div>
+                        <div class="concert-add-container mt-8" *ngIf="isConcertAddFormShown">
+                            <sb-concert-add class="p-8"
+                                            [concert]="concertAdd"
+                                            (concertAdd)="handleConcertAdd($event)"
+                            >
+                            </sb-concert-add>
+                        </div>
+                        <sb-concert-item-list
+                            [concert]="operateConcert"
+                            (concertItemDelete)="handleDeleteConcertItem($event)"
+                            (songSelect)="handleSongSelect($event)"
+                            (concertItemSelect)="handleConcertItemSelect($event)"
+                            class="mt-8"
+                        >
+                        </sb-concert-item-list>
                     </div>
 
                 </div>
-                <div class="suggest-container" fxFlex="1 1 auto">
-                    suggest
+                <div class="suggest-container pr-20" fxFlex="1 1 400px">
+                    <sb-song-tag-list
+                        [tags]="suggestSongSearchTags"
+                        [foundTags]="suggestSongsSearchTagsFoundTags"
+                        (tagSelect)="handleSuggestSongsSearchTagAdd($event)"
+                        (tagSearch)="handleSongListSearchTagSearch($event)"
+                        (tagRemove)="handleSuggestSongsSearchTagRemove($event)"
+                    >
+                    </sb-song-tag-list>
+                    <sb-suggested-song-list
+                        [title]="''"
+                        [result]="suggestSongsSearchTagsFoundSongsResult"
+                        [dataFilter]="suggestSongsSearchTagsDataFilter"
+                        [itemFormatter]="suggestSongsSearchTagsFormatter"
+                        (songSelect)="handleSongSelect($event)"
+                        (filterChange)="handleSuggestSongsSearchTagsDataFilterChange($event)"
+                        class="mb-16"
+                    ></sb-suggested-song-list>
+
+                    <sb-suggested-song-list
+                        [result]="suggestSongsPopularFoundSongsResult"
+                        [dataFilter]="suggestSongsPopularDataFilter"
+                        [isPlayControlEnabled]="true"
+                        [isPlaying]="!!suggestSongsPopularFoundPlayInterval"
+                        [itemFormatter]="suggestSongsPopularFormatter"
+                        [title]="'Popular Songs'"
+                        (songSelect)="handleSuggestItemSelect($event)"
+                        (filterChange)="handleSuggestSongsPopularDataFilterChange($event)"
+                        (playStateChange)="handleSuggestSongsPopularAutoPlayStateChange()"
+                    ></sb-suggested-song-list>
                 </div>
 
             </div>
