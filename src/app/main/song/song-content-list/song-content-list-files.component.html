@@ -1,0 +1,16 @@
+<mat-table [dataSource]="songContentFiles">
+    <!-- Position Column -->
+    <ng-container matColumnDef="fileName">
+        <mat-header-cell *matHeaderCellDef fxFlex="1 1 auto" class="col-name"> Name </mat-header-cell>
+        <mat-cell *matCellDef="let item" fxFlex="1 1 auto" class="col-name"><a [href]="getContentOpenUrl(item)"><div [attr.style]="getContentIconStyle(item)" class="icon"></div> {{item.fileName}}</a></mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="createTime">
+        <mat-header-cell *matHeaderCellDef fxFlex="4 1 auto"> Modified </mat-header-cell>
+        <mat-cell *matCellDef="let item" fxFlex="4 1 auto"> {{item.createTime | date:'short'}}</mat-cell>
+    </ng-container>
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>

@@ -16,6 +16,7 @@ import {
 import { SbSongViewComponent } from './song-view/song-view.component';
 import { SbSongContainerComponent } from './song-container.component';
 import { SbSongContentListVideoComponent } from './song-content-list-video/song-content-list-video.component';
+import { SbSongContentListFilesComponent } from './song-content-list/song-content-list-files.component';
 import { SongContentVideoFrameDirective } from './song-content-list-video/song-content-video-frame.directive';
 import { SbSongContentVideoAddComponent } from './song-content-add-video/song-content-video-add.component';
 import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
@@ -29,6 +30,7 @@ import {SongHeaderModule} from '../../shared/modules/song-header/song-header.mod
         SbSongContainerComponent,
         SbSongViewComponent,
         SbSongContentListVideoComponent,
+        SbSongContentListFilesComponent,
         SongContentVideoFrameDirective,
         SbSongContentVideoAddComponent,
     ],

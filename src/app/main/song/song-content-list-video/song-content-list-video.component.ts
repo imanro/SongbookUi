@@ -22,11 +22,14 @@ export class SbSongContentListVideoComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log('Get video content', this.getVideoContent());
     }
 
-    getVideoContent(): SbSongContent[] {
-        return this.songContentVideoService.getSongContentVideo(this.song);
+    get videoContent(): SbSongContent[] {
+        if (this.song) {
+            return this.songContentVideoService.getSongContentVideo(this.song);
+        } else {
+            return [];
+        }
     }
 
     handleContentRemove(item: SbSongContent): void {

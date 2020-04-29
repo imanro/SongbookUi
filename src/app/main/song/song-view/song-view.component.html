@@ -35,7 +35,12 @@
             >
             </sb-song-content-list-video>
         </mat-tab>
-        <mat-tab label="Files"> Content 2 </mat-tab>
+        <mat-tab label="Files">
+            <sb-song-content-list-files
+                [song]="song"
+            >
+            </sb-song-content-list-files>
+        </mat-tab>
     </mat-tab-group>
 
 </div>

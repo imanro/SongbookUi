@@ -2,11 +2,13 @@ import {Injectable} from '@angular/core';
 import {SbSongContent} from '../models/song-content.model';
 import {SbSong} from '../models/song.model';
 import {SbSongContentTypeEnum} from '../enums/song-content.type.enum';
+import {SbSongContentService} from './song-content.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class SbSongContentVideoService {
+export class SbSongContentVideoService extends SbSongContentService{
+
     getSongContentVideo(song: SbSong): SbSongContent[] {
         return song.content.filter(currentContent => currentContent.type === SbSongContentTypeEnum.LINK && currentContent.content.match(/(?:youtube|godtube)/i) );
     }
