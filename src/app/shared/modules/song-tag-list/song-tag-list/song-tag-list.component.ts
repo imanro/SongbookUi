@@ -31,6 +31,8 @@ export class SongTagListComponent implements OnInit, OnDestroy {
 
     @Output() tagSearch = new EventEmitter<string>();
 
+    @Output() tagPoint = new EventEmitter<SbTag>();
+
     @ViewChild('tagInput', {static: false}) tagInput: ElementRef<HTMLInputElement>;
 
     separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -80,6 +82,11 @@ export class SongTagListComponent implements OnInit, OnDestroy {
 
     handleTagDetach(tag: SbTag): void {
         this.tagRemove.next(tag);
+    }
+
+    handleTagPoint(tag: SbTag): void {
+        console.log('point');
+        this.tagPoint.next(tag);
     }
 
     handleTagSearch(e: KeyboardEvent): void {

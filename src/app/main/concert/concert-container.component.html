@@ -27,6 +27,7 @@
                             <sb-song-tag-list
                                 *ngIf="operateSong.tags && operateSong.tags.length > 0"
                                 [tags]="operateSong.tags"
+                                (tagPoint)="handleSuggestSongsSearchTagAdd($event)"
                                 [isViewMode]="true"
                                 class="mt-16"
                                 fxFlex="1 0 auto"
@@ -99,6 +100,16 @@
                     ></sb-suggested-song-list>
 
                     <sb-suggested-song-list
+                        [title]="''"
+                        [result]="suggestSongsSearchTagsFoundSongsResult"
+                        [dataFilter]="suggestSongsSearchTagsDataFilter"
+                        [itemFormatter]="suggestSongsSearchTagsFormatter"
+                        (songSelect)="handleSongSelect($event)"
+                        (filterChange)="handleSuggestSongsSearchTagsDataFilterChange($event)"
+                        class="mb-16"
+                    ></sb-suggested-song-list>
+
+                    <sb-suggested-song-list
                         [result]="suggestSongsAfterFoundSongsResult"
                         [title]="'Usually followed by:'"
                         [dataFilter]="suggestSongsAfterDataFilter"
@@ -108,16 +119,6 @@
                         (refresh)="handleSuggestSongsAfterRefresh()"
                         class="mb-16"
                         *ngIf="operateSong"
-                    ></sb-suggested-song-list>
-
-                    <sb-suggested-song-list
-                        [title]="''"
-                        [result]="suggestSongsSearchTagsFoundSongsResult"
-                        [dataFilter]="suggestSongsSearchTagsDataFilter"
-                        [itemFormatter]="suggestSongsSearchTagsFormatter"
-                        (songSelect)="handleSongSelect($event)"
-                        (filterChange)="handleSuggestSongsSearchTagsDataFilterChange($event)"
-                        class="mb-16"
                     ></sb-suggested-song-list>
 
                     <sb-suggested-song-list
