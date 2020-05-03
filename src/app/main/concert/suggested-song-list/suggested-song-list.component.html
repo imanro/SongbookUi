@@ -1,7 +1,7 @@
 <ng-container *ngIf="result && result.rows && result.rows.length > 0">
     <div class="container suggested-songs-block" fxLayout="column">
         <h4 *ngIf="title" class="m-0 mb-4">{{title}}</h4>
-        <div class="play-controls mb-4" fxLayoutAlign="space-between start" *ngIf="(isForwardControlEnabled || isBackwardControlEnabled) || (isPlayControlEnabled || isRefreshControlEnabled)">
+        <div class="play-controls mb-4" fxLayoutAlign="space-between start" *ngIf="(isForwardControlEnabled || isBackwardControlEnabled) || isPlayControlEnabled">
 
             <button mat-icon-button aria-label="backward" [disabled]="!isBackwardControlEnabled" (click)="handleSkipBackward()" color="accent" fxFlex="0 0 auto" *ngIf="isNavigateControlEnabled; else dummyBackButton">
                 <mat-icon>fast_rewind</mat-icon>
@@ -13,10 +13,6 @@
 
             <button mat-icon-button aria-label="pause" color="accent" fxFlex="0 0 auto" (click)="handlePlayStateChanged()" *ngIf="isPlayControlEnabled">
                 <mat-icon>{{playControlIcon}}</mat-icon>
-            </button>
-
-            <button mat-icon-button aria-label="refresh" color="accent" fxFlex="0 0 auto" (click)="handleRefresh()" *ngIf="isRefreshControlEnabled">
-                <mat-icon>refresh</mat-icon>
             </button>
 
             <button mat-icon-button aria-label="forward" [disabled]="!isForwardControlEnabled" (click)="handleSkipForward()" color="accent" fxFlex="0 0 auto" *ngIf="isNavigateControlEnabled; else dummyForwardButton">
@@ -33,6 +29,12 @@
             <div class="item mb-4" *ngFor="let item of result.rows; let i = index" fxLayoutAlign="space-between end">
                 <div class="title" (click)="handleSongSelect(item)" [innerHTML]="formatItem(item, i)"></div>
             </div>
+        </div>
+
+        <div class="refresh-controls" fxLayoutAlign="center start" *ngIf="isRefreshControlEnabled">
+            <button mat-icon-button aria-label="refresh" color="accent" fxFlex="0 0 auto" (click)="handleRefresh()" *ngIf="isRefreshControlEnabled">
+                <mat-icon>refresh</mat-icon>
+            </button>
         </div>
     </div>
 </ng-container>
