@@ -88,6 +88,16 @@
                     </sb-song-tag-list>
 
                     <sb-suggested-song-list
+                        [title]="''"
+                        [result]="suggestSongsSearchTagsFoundSongsResult"
+                        [dataFilter]="suggestSongsSearchTagsDataFilter"
+                        [itemFormatter]="suggestSongsSearchTagsFormatter"
+                        (songSelect)="handleSongSelect($event)"
+                        (filterChange)="handleSuggestSongsSearchTagsDataFilterChange($event)"
+                        class="mb-16"
+                    ></sb-suggested-song-list>
+
+                    <sb-suggested-song-list
                         [result]="suggestSongsBeforeFoundSongsResult"
                         [title]="'Usually prepended with:'"
                         [dataFilter]="suggestSongsBeforeDataFilter"
@@ -97,16 +107,6 @@
                         (refresh)="handleSuggestSongsBeforeRefresh()"
                         class="mb-16"
                         *ngIf="operateSong"
-                    ></sb-suggested-song-list>
-
-                    <sb-suggested-song-list
-                        [title]="''"
-                        [result]="suggestSongsSearchTagsFoundSongsResult"
-                        [dataFilter]="suggestSongsSearchTagsDataFilter"
-                        [itemFormatter]="suggestSongsSearchTagsFormatter"
-                        (songSelect)="handleSongSelect($event)"
-                        (filterChange)="handleSuggestSongsSearchTagsDataFilterChange($event)"
-                        class="mb-16"
                     ></sb-suggested-song-list>
 
                     <sb-suggested-song-list

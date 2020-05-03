@@ -152,7 +152,7 @@ export class SbSongRepository extends SbBaseRepository {
 
     findSongsAfter(song: SbSong, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
 
-        const url = this.getApiUrl('/song-suggest/before/' + song.id, filter);
+        const url = this.getApiUrl('/song-suggest/after/' + song.id, filter);
 
         return this.http.get<SbSong>(url)
             .pipe(
