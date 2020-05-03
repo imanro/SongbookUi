@@ -1,19 +1,31 @@
 <ng-container *ngIf="result && result.rows && result.rows.length > 0">
     <div class="container suggested-songs-block" fxLayout="column">
         <h4 *ngIf="title" class="m-0 mb-4">{{title}}</h4>
-        <div class="play-controls mb-4" fxLayoutAlign="space-between start" *ngIf="isForwardControlEnabled || isBackwardControlEnabled">
+        <div class="play-controls mb-4" fxLayoutAlign="space-between start" *ngIf="(isForwardControlEnabled || isBackwardControlEnabled) || (isPlayControlEnabled || isRefreshControlEnabled)">
 
-            <button mat-icon-button aria-label="backward" [disabled]="!isBackwardControlEnabled" (click)="handleSkipBackward()" color="accent" fxFlex="0 0 auto">
+            <button mat-icon-button aria-label="backward" [disabled]="!isBackwardControlEnabled" (click)="handleSkipBackward()" color="accent" fxFlex="0 0 auto" *ngIf="isNavigateControlEnabled; else dummyBackButton">
                 <mat-icon>fast_rewind</mat-icon>
             </button>
+
+            <ng-template #dummyBackButton>
+                <div class="dummy-control"></div>
+            </ng-template>
 
             <button mat-icon-button aria-label="pause" color="accent" fxFlex="0 0 auto" (click)="handlePlayStateChanged()" *ngIf="isPlayControlEnabled">
                 <mat-icon>{{playControlIcon}}</mat-icon>
             </button>
 
-            <button mat-icon-button aria-label="forwsard" [disabled]="!isForwardControlEnabled" (click)="handleSkipForward()" color="accent" fxFlex="0 0 auto">
+            <button mat-icon-button aria-label="refresh" color="accent" fxFlex="0 0 auto" (click)="handleRefresh()" *ngIf="isRefreshControlEnabled">
+                <mat-icon>refresh</mat-icon>
+            </button>
+
+            <button mat-icon-button aria-label="forward" [disabled]="!isForwardControlEnabled" (click)="handleSkipForward()" color="accent" fxFlex="0 0 auto" *ngIf="isNavigateControlEnabled; else dummyForwardButton">
                 <mat-icon>fast_forward</mat-icon>
             </button>
+
+            <ng-template #dummyForwardButton>
+                <div class="dummy-control"></div>
+            </ng-template>
 
         </div>
 

@@ -21,6 +21,10 @@ export class SuggestSongListComponent implements OnInit {
 
     @Input() isPlayControlEnabled = false;
 
+    @Input() isRefreshControlEnabled = false;
+
+    @Input() isNavigateControlEnabled = true;
+
     @Input() isPlaying = false;
 
     @Input() itemFormatter: (item: any, position: number) => string;
@@ -30,6 +34,8 @@ export class SuggestSongListComponent implements OnInit {
     @Output() filterChange = new EventEmitter<AppDataFilter>();
 
     @Output() playStateChange = new EventEmitter<void>();
+
+    @Output() refresh = new EventEmitter<void>();
 
     constructor(
         private songService: SbSongService
@@ -87,5 +93,9 @@ export class SuggestSongListComponent implements OnInit {
 
     handlePlayStateChanged(): void {
         this.playStateChange.next();
+    }
+
+    handleRefresh(): void {
+        this.refresh.next();
     }
 }

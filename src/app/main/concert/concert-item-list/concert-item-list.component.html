@@ -1,11 +1,20 @@
 <ng-container *ngIf="concert">
-    <div class="item p-4 mb-4" *ngFor="let item of concert.items; let i = index" fxLayoutAlign="space-between end">
-        <div class="title" (click)="handleConcertItemSelect(item)">{{i + 1}}. {{formatConcertItemTitle(item)}}</div>
-        <div class="actions">
-            <mat-icon (click)="handleSongSelect(item)">remove_red_eye</mat-icon>
-            <mat-icon (click)="handleDeleteConcertItem(item)">delete</mat-icon>
-            <mat-icon class="draggable">drag_handle</mat-icon>
+    <div class="container" cdkDropList (cdkDropListDropped)="handleDrop($event)">
+        <div class="item p-4 mb-4" *ngFor="let item of concert.items; let i = index" fxLayoutAlign="flex-start center"
+             [ngClass]="{selected: isConcertItemSelected(item)}" cdkDrag>
+            <div class="select-action mr-8">
+                <mat-icon (click)="handleConcertItemSelectToggle(item)"
+                          *ngIf="!isConcertItemSelected(item); else checkedIcon">check_box_outline_blank
+                </mat-icon>
+                <ng-template #checkedIcon>
+                    <mat-icon (click)="handleConcertItemSelectToggle(item)" class="selected">check_box</mat-icon>
+                </ng-template>
+            </div>
+            <div class="title" (click)="handleSongSelect(item)">{{i + 1}}. {{formatConcertItemTitle(item)}}</div>
+            <div class="actions">
+                <mat-icon (click)="handleDeleteConcertItem(item)">delete</mat-icon>
+                <mat-icon class="draggable" cdkDragHandle>drag_handle</mat-icon>
+            </div>
         </div>
     </div>
-
 </ng-container>

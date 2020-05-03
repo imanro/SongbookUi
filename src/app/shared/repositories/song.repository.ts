@@ -12,6 +12,8 @@ import {AppConfig} from '../../app.config';
 import {SbSongMapper} from '../mappers/song.mapper';
 import {SbPopularItemMapper} from '../mappers/popular-item.mapper';
 import {SbPopularItem} from '../models/popular-item.model';
+import {SbSuggestItem} from '../models/suggest-item.model';
+import {SbSuggestItemMapper} from '../mappers/suggest-item.mapper';
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +22,8 @@ import {SbPopularItem} from '../models/popular-item.model';
 export class SbSongRepository extends SbBaseRepository {
 
     private songMapper: SbSongMapper;
+
+    private suggestItemMapper: SbSuggestItemMapper;
 
     private popularItemMapper: SbPopularItemMapper;
 
@@ -69,6 +73,96 @@ export class SbSongRepository extends SbBaseRepository {
                     if (response.content) {
                         for (const row of response.content) {
                             const item = this.mapDataToPopularItem(row);
+                            result.rows.push(item);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
+    findSongsRecent(startDate: Date, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+
+        const url = this.getApiUrl('/song-suggest/recent/' +
+            startDate.getFullYear() + '-' + (startDate.getMonth() + 1).toString().padStart(2, '0') + '-' + startDate.getDate().toString().padStart(2, '0'), filter);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, AppApiResult<SbSuggestItem>>(response => {
+
+                    const result = this.createResultFromApiResponse<SbSuggestItem>(response);
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const item = this.mapDataToSuggestItem(row);
+                            result.rows.push(item);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
+    findSongsAbandoned(startDate: Date, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+
+        const url = this.getApiUrl('/song-suggest/abandoned/' +
+            startDate.getFullYear() + '-' + (startDate.getMonth() + 1).toString().padStart(2, '0') + '-' + startDate.getDate().toString().padStart(2, '0'), filter, true);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, AppApiResult<SbSuggestItem>>(response => {
+
+                    const result = this.createResultFromApiResponse<SbSuggestItem>(response);
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const item = this.mapDataToSuggestItem(row);
+                            result.rows.push(item);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
+    findSongsBefore(song: SbSong, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+
+        const url = this.getApiUrl('/song-suggest/before/' + song.id, filter);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, AppApiResult<SbSuggestItem>>(response => {
+
+                    const result = this.createResultFromApiResponse<SbSuggestItem>(response);
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const item = this.mapDataToSuggestItem(row);
+                            result.rows.push(item);
+                        }
+                    }
+
+                    return result;
+                })
+            );
+    }
+
+    findSongsAfter(song: SbSong, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+
+        const url = this.getApiUrl('/song-suggest/before/' + song.id, filter);
+
+        return this.http.get<SbSong>(url)
+            .pipe(
+                map<any, AppApiResult<SbSuggestItem>>(response => {
+
+                    const result = this.createResultFromApiResponse<SbSuggestItem>(response);
+
+                    if (response.content) {
+                        for (const row of response.content) {
+                            const item = this.mapDataToSuggestItem(row);
                             result.rows.push(item);
                         }
                     }
@@ -147,8 +241,21 @@ export class SbSongRepository extends SbBaseRepository {
         return this.popularItemMapper;
     }
 
+    private getSuggestItemMapper(): SbSuggestItemMapper {
+        if (!this.suggestItemMapper) {
+            this.suggestItemMapper = new SbSuggestItemMapper();
+        }
+
+        return this.suggestItemMapper;
+    }
+
     private mapDataToSong(row: any): SbSong {
         const mapper = this.getSongMapper();
+        return mapper.mapToEntity(row);
+    }
+
+    private mapDataToSuggestItem(row: any): SbSuggestItem {
+        const mapper = this.getPopularItemMapper();
         return mapper.mapToEntity(row);
     }
 

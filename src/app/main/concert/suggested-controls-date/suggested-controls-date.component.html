@@ -1,0 +1,9 @@
+<div [formGroup]="suggestedControlsForm">
+    <mat-form-field fxFlex="2 0 auto" class="mr-8">
+        <mat-label>Date</mat-label>
+        <input matInput formControlName="suggestedDate" [matDatepicker]="picker"
+               placeholder="Choose a date" (dateChange)="handleSuggestedDateChange($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+</div>

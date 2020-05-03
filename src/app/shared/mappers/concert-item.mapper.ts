@@ -1,8 +1,12 @@
 import {SbBaseEntityMapperAbstract} from './base-entity.mapper';
 import {SbConcertItem} from '../models/concert-item.model';
 import {SbSongMapper} from './song.mapper';
+import {SbConcertMapper} from './concert.mapper';
+import {SbConcert} from '../models/concert.model';
 
 export class SbConcertItemMapper extends SbBaseEntityMapperAbstract<SbConcertItem> {
+
+    private concertMapper: SbConcertMapper;
 
     private songMapper: SbSongMapper;
 
@@ -22,7 +26,7 @@ export class SbConcertItemMapper extends SbBaseEntityMapperAbstract<SbConcertIte
         return entity;
     }
 
-    mapToData(entity: SbConcertItem): any {
+    mapToData(entity: SbConcertItem, concert: SbConcert = null): any {
 
         const data: any = {};
 
@@ -36,8 +40,9 @@ export class SbConcertItemMapper extends SbBaseEntityMapperAbstract<SbConcertIte
 
         if (entity.concert) {
             data.concert = {id: entity.concert.id};
+        } else if (concert !== null) {
+            data.concert = {id: concert.id};
         }
-
 
         data.orderValue = entity.orderValue;
 
@@ -49,5 +54,12 @@ export class SbConcertItemMapper extends SbBaseEntityMapperAbstract<SbConcertIte
             this.songMapper = new SbSongMapper();
         }
         return this.songMapper;
+    }
+
+    private getConcertMapper(): SbConcertMapper {
+        if (this.concertMapper === undefined) {
+            this.concertMapper = new SbConcertMapper();
+        }
+        return this.concertMapper;
     }
 }

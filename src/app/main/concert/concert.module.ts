@@ -19,12 +19,15 @@ import { SuggestSongListComponent } from './suggested-song-list/suggested-song-l
 import { ConcertAddComponent } from './concert-add/concert-add.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { SuggestedControlsDateComponent } from './suggested-controls-date/suggested-controls-date.component';
 
 
 @NgModule({
-    declarations: [SbConcertContainerComponent, ConcertSummaryComponent, ConcertItemListComponent, SuggestSongListComponent, ConcertAddComponent],
+    declarations: [SbConcertContainerComponent, ConcertSummaryComponent, ConcertItemListComponent, SuggestSongListComponent, ConcertAddComponent, SuggestedControlsDateComponent],
     imports: [
         CommonModule,
+        DragDropModule,
         FuseSharedModule,
         ReactiveFormsModule,
         MatDatepickerModule,

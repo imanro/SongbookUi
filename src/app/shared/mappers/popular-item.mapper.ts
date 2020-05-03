@@ -1,23 +1,14 @@
-import {SbBaseEntityMapperAbstract} from './base-entity.mapper';
 import {SbPopularItem} from '../models/popular-item.model';
-import {SbSongMapper} from './song.mapper';
 import {SbConcertMapper} from './concert.mapper';
+import {SbSuggestItemMapper} from './suggest-item.mapper';
 
-export class SbPopularItemMapper extends SbBaseEntityMapperAbstract<SbPopularItem> {
+export class SbPopularItemMapper extends SbSuggestItemMapper {
 
     private concertMapper: SbConcertMapper;
 
-    private songMapper: SbSongMapper;
-
     mapToEntity(row: any): SbPopularItem {
 
-        const entity = new SbPopularItem();
-        entity.total = row.total;
-
-        if (row.song) {
-            const mapper = this.getSongMapper();
-            entity.song = mapper.mapToEntity(row.song);
-        }
+        const entity = super.mapToEntity(row);
 
         if (row.lastConcert) {
             const mapper = this.getConcertMapper();
@@ -35,12 +26,5 @@ export class SbPopularItemMapper extends SbBaseEntityMapperAbstract<SbPopularIte
             this.concertMapper = new SbConcertMapper();
         }
         return this.concertMapper;
-    }
-
-    private getSongMapper(): SbSongMapper {
-        if (this.songMapper === undefined) {
-            this.songMapper = new SbSongMapper();
-        }
-        return this.songMapper;
     }
 }

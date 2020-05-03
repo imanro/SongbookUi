@@ -27,7 +27,6 @@
                             <sb-song-tag-list
                                 *ngIf="operateSong.tags && operateSong.tags.length > 0"
                                 [tags]="operateSong.tags"
-                                (tagPoint)="handleSuggestSongsSearchTagAdd($event)"
                                 [isViewMode]="true"
                                 class="mt-16"
                                 fxFlex="1 0 auto"
@@ -66,9 +65,11 @@
                         </div>
                         <sb-concert-item-list
                             [concert]="operateConcert"
+                            [concertItemsSelected]="concertItemsSelected"
                             (concertItemDelete)="handleDeleteConcertItem($event)"
                             (songSelect)="handleSongSelect($event)"
-                            (concertItemSelect)="handleConcertItemSelect($event)"
+                            (concertItemSelectToggle)="handleConcertItemSelectToggle($event)"
+                            (concertItemsReordered)="handleConcertItemsReordered($event)"
                             class="mt-8"
                         >
                         </sb-concert-item-list>
@@ -84,6 +85,31 @@
                         (tagRemove)="handleSuggestSongsSearchTagRemove($event)"
                     >
                     </sb-song-tag-list>
+
+                    <sb-suggested-song-list
+                        [result]="suggestSongsBeforeFoundSongsResult"
+                        [title]="'Usually prepended with:'"
+                        [dataFilter]="suggestSongsBeforeDataFilter"
+                        [isNavigateControlEnabled]="false"
+                        [isRefreshControlEnabled]="true"
+                        (songSelect)="handleSuggestItemSelect($event)"
+                        (refresh)="handleSuggestSongsBeforeRefresh()"
+                        class="mb-16"
+                        *ngIf="operateSong"
+                    ></sb-suggested-song-list>
+
+                    <sb-suggested-song-list
+                        [result]="suggestSongsAfterFoundSongsResult"
+                        [title]="'Usually followed by:'"
+                        [dataFilter]="suggestSongsAfterDataFilter"
+                        [isNavigateControlEnabled]="false"
+                        [isRefreshControlEnabled]="true"
+                        (songSelect)="handleSuggestItemSelect($event)"
+                        (refresh)="handleSuggestSongsAfterRefresh()"
+                        class="mb-16"
+                        *ngIf="operateSong"
+                    ></sb-suggested-song-list>
+
                     <sb-suggested-song-list
                         [title]="''"
                         [result]="suggestSongsSearchTagsFoundSongsResult"
@@ -104,7 +130,44 @@
                         (songSelect)="handleSuggestItemSelect($event)"
                         (filterChange)="handleSuggestSongsPopularDataFilterChange($event)"
                         (playStateChange)="handleSuggestSongsPopularAutoPlayStateChange()"
+                        class="mb-16"
                     ></sb-suggested-song-list>
+
+                    <div class="container">
+                    <h4 class="m-0 mb-4">Recent songs</h4>
+                    <sb-suggested-controls-date
+                        [suggestedDate]="suggestSongsRecentStartDate"
+                        (suggestedDateChange)="handleSuggestSongsRecentSuggestedStartDateChange($event)"
+                    ></sb-suggested-controls-date>
+                        <sb-suggested-song-list
+                            [result]="suggestSongsRecentFoundSongsResult"
+                            [title]="''"
+                            [dataFilter]="suggestSongsRecentDataFilter"
+                            [isNavigateControlEnabled]="false"
+                            [isRefreshControlEnabled]="true"
+                            (songSelect)="handleSuggestItemSelect($event)"
+                            (refresh)="handleSuggestSongsRecentRefresh()"
+                            class="mb-16"
+                        ></sb-suggested-song-list>
+                    </div>
+
+                    <div class="container">
+                        <h4 class="m-0 mb-4">Abandoned songs</h4>
+                        <sb-suggested-controls-date
+                            [suggestedDate]="suggestSongsAbandonedStartDate"
+                            (suggestedDateChange)="handleSuggestSongsAbandonedSuggestedStartDateChange($event)"
+                        ></sb-suggested-controls-date>
+                        <sb-suggested-song-list
+                            [result]="suggestSongsAbandonedFoundSongsResult"
+                            [title]="''"
+                            [dataFilter]="suggestSongsAbandonedDataFilter"
+                            [isNavigateControlEnabled]="false"
+                            [isRefreshControlEnabled]="true"
+                            (songSelect)="handleSuggestItemSelect($event)"
+                            (refresh)="handleSuggestSongsAbandonedRefresh()"
+                            class="mb-16"
+                        ></sb-suggested-song-list>
+                    </div>
                 </div>
 
             </div>

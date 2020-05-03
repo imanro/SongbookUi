@@ -110,6 +110,25 @@ export abstract class SbConcertRepository extends SbBaseRepository {
             );
     }
 
+    saveConcertItemsBulk(concert: SbConcert): Observable<SbConcertItem> {
+
+        const url = this.getApiUrl('/concert/item/bulk');
+
+        const data = [];
+        for (const item of concert.items) {
+            data.push(this.mapConcertItemToData(item, concert));
+        }
+
+        return this.http.put(url, data, this.getDefaultHttpPostOptions())
+            .pipe(
+                map(responseData => {
+                    console.log('The response is follow:', responseData);
+                    return this.mapDataToConcertItem(responseData);
+                }),
+                catchError(this.handleHttpError<SbConcertItem>())
+            );
+    }
+
     deleteConcertItem(concertItem: SbConcertItem): Observable<any> {
 
         const url = this.getApiUrl('/concert/item/' + concertItem.id);
@@ -152,9 +171,9 @@ export abstract class SbConcertRepository extends SbBaseRepository {
         return mapper.mapToEntity(row);
     }
 
-    private mapConcertItemToData(entity: SbConcertItem): any {
+    private mapConcertItemToData(entity: SbConcertItem, concert: SbConcert = null): any {
         const mapper = this.getConcertItemMapper();
-        return mapper.mapToData(entity);
+        return mapper.mapToData(entity, concert);
     }
 
 }

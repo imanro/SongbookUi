@@ -18,6 +18,7 @@ import {SbPopularItem} from '../../shared/models/popular-item.model';
 import {SbSongService} from '../../shared/services/song.service';
 import {SbSuggestItem} from '../../shared/models/suggest-item.model';
 import {SbUser} from '../../shared/models/user.model';
+import {moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'sb-concert-container',
@@ -46,11 +47,37 @@ export class SbConcertContainerComponent implements OnInit {
 
     suggestSongsPopularFormatter: (item: any, position: number) => string;
 
+    suggestSongsRecentFoundSongsResult: AppApiResult<SbSuggestItem>;
+
+    suggestSongsRecentPlayInterval: any = null;
+
+    suggestSongsRecentDataFilter: AppDataFilter;
+
+    suggestSongsRecentStartDate: Date;
+
+    suggestSongsAbandonedFoundSongsResult: AppApiResult<SbSuggestItem>;
+
+    suggestSongsAbandonedPlayInterval: any = null;
+
+    suggestSongsAbandonedDataFilter: AppDataFilter;
+
+    suggestSongsAbandonedStartDate: Date;
+
+    suggestSongsBeforeFoundSongsResult: AppApiResult<SbSuggestItem>;
+
+    suggestSongsBeforeDataFilter: AppDataFilter;
+
+    suggestSongsAfterFoundSongsResult: AppApiResult<SbSuggestItem>;
+
+    suggestSongsAfterDataFilter: AppDataFilter;
+
     tagsListDataFilter: AppDataFilter;
 
     foundTextSearchSongs: SbSong[] = [];
 
     operateSong: SbSong;
+
+    concertItemsSelected: SbConcertItem[];
 
     operateConcert: SbConcert;
 
@@ -81,6 +108,10 @@ export class SbConcertContainerComponent implements OnInit {
 
         this.initSuggestSongsSearchTags();
         this.initSuggestSongsPopular();
+        this.initSuggestSongsRecent();
+        this.initSuggestSongsAbandoned();
+        this.initSuggestSongsAfter();
+        this.initSuggestSongsBefore();
         this.initNewConcert();
     }
 
@@ -178,17 +209,88 @@ export class SbConcertContainerComponent implements OnInit {
         this.suggestSongsPopularAutoPlayToggle();
     }
 
+    handleSuggestSongsRecentSuggestedStartDateChange(date: Date): void {
+        this.suggestSongsRecentStartDate = date;
+
+        this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
+            .subscribe(result => {
+                this.suggestSongsRecentFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsAbandonedSuggestedStartDateChange(date: Date): void {
+        this.suggestSongsAbandonedStartDate = date;
+
+        this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
+            .subscribe(result => {
+                this.suggestSongsAbandonedFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsRecentRefresh(): void {
+        this.setSongsRecentAutoPlay();
+
+        this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
+            .subscribe(result => {
+                this.suggestSongsRecentFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsAbandonedRefresh(): void {
+        this.setSongsAbandonedAutoPlay();
+
+        this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
+            .subscribe(result => {
+                this.suggestSongsAbandonedFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsBeforeRefresh(): void {
+
+        this.fetchSongsBefore(this.operateSong, this.suggestSongsBeforeDataFilter)
+            .subscribe(result => {
+                this.suggestSongsBeforeFoundSongsResult = result;
+            });
+    }
+
+    handleSuggestSongsAfterRefresh(): void {
+
+        this.fetchSongsAfter(this.operateSong, this.suggestSongsAfterDataFilter)
+            .subscribe(result => {
+                this.suggestSongsAfterFoundSongsResult = result;
+            });
+    }
 
     handleSongSelect(song: SbSong): void {
         this.operateSong = song;
+
+        this.fetchSongsBefore(this.operateSong, this.suggestSongsBeforeDataFilter)
+            .subscribe(result => {
+                this.suggestSongsBeforeFoundSongsResult = result;
+            });
+
+        this.fetchSongsAfter(this.operateSong, this.suggestSongsAfterDataFilter)
+            .subscribe(result => {
+                this.suggestSongsAfterFoundSongsResult = result;
+            });
     }
 
     handleSuggestItemSelect(item: SbSuggestItem): void {
         this.operateSong = item.song;
     }
 
-    handleConcertItemSelect(concertItem: SbConcertItem): void {
-        // do nothing so far
+    handleConcertItemSelectToggle(concertItem: SbConcertItem): void {
+        if (!this.concertItemsSelected) {
+            this.concertItemsSelected = [];
+        }
+
+        if (this.concertItemsSelected.find(curItem => curItem.id === concertItem.id) === undefined) {
+            console.log('checking');
+            this.concertItemsSelected.push(concertItem);
+        } else {
+            console.log('un-checking');
+            this.concertItemsSelected = this.concertItemsSelected.filter(curItem => curItem.id !== concertItem.id);
+        }
     }
 
     handleAddSongToConcert(song: SbSong, concert: SbConcert): void {
@@ -249,6 +351,24 @@ export class SbConcertContainerComponent implements OnInit {
         });
     }
 
+    handleConcertItemsReordered(order: [number, number]): void {
+        if (this.operateConcert && this.operateConcert.items) {
+            this.isLoading = true;
+            moveItemInArray(this.operateConcert.items, order[0], order[1]);
+
+            this.concertRepository.saveConcertItemsBulk(this.operateConcert)
+                .pipe(
+                    finalize(() => {
+                        this.isLoading = false;
+                    })
+                )
+                .subscribe(() => {
+                    // re-read concert
+                    this.fetchConcert(this.operateConcert.id);
+                });
+        }
+    }
+
     private processRouteParams(): void {
         // temporary assign last concert; in future - process concert id url param
         this.fetchLastConcert();
@@ -290,6 +410,57 @@ export class SbConcertContainerComponent implements OnInit {
         this.suggestSongsPopularAutoPlayStart();
     }
 
+    private initSuggestSongsRecent(): void {
+
+        this.suggestSongsRecentDataFilter = this.songRepository.createDataFilter();
+        this.suggestSongsRecentDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsRecentDataFilter.offset = 0;
+
+        const curDate = new Date();
+        this.suggestSongsRecentStartDate = new Date(curDate.getFullYear(), curDate.getMonth() - 24, curDate.getDate(), 0, 0, 0);
+
+        this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
+            .subscribe(result => {
+                this.suggestSongsRecentFoundSongsResult = result;
+            });
+
+        this.setSongsRecentAutoPlay();
+    }
+
+    private initSuggestSongsAbandoned(): void {
+
+        this.suggestSongsAbandonedDataFilter = this.songRepository.createDataFilter();
+        this.suggestSongsAbandonedDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsAbandonedDataFilter.offset = 0;
+
+        this.suggestSongsAbandonedDataFilter.where = new AppDataFilterWhere();
+        this.suggestSongsAbandonedDataFilter.where.addField('performancesThreshold', 5);
+
+        const curDate = new Date();
+        this.suggestSongsAbandonedStartDate = new Date(curDate.getFullYear(), curDate.getMonth() - 24, curDate.getDate(), 0, 0, 0);
+
+        this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
+            .subscribe(result => {
+                this.suggestSongsAbandonedFoundSongsResult = result;
+            });
+
+        this.setSongsAbandonedAutoPlay();
+    }
+
+    private initSuggestSongsBefore(): void {
+
+        this.suggestSongsBeforeDataFilter = this.songRepository.createDataFilter();
+        this.suggestSongsBeforeDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsBeforeDataFilter.offset = 0;
+    }
+
+    private initSuggestSongsAfter(): void {
+
+        this.suggestSongsAfterDataFilter = this.songRepository.createDataFilter();
+        this.suggestSongsAfterDataFilter.limit = this.appConfig.suggestListRowsLimit;
+        this.suggestSongsAfterDataFilter.offset = 0;
+    }
+
     private initNewConcert(): void {
         this.concertAdd = new SbConcert();
 
@@ -298,6 +469,32 @@ export class SbConcertContainerComponent implements OnInit {
 
         // 9:00 AM by default :)
         this.concertAdd.time = new Date(curDate.getFullYear(), curDate.getMonth(), curDate.getDate() + datePlus, 9);
+    }
+
+    private setSongsRecentAutoPlay(): void {
+        if (this.suggestSongsRecentPlayInterval) {
+            window.clearInterval(this.suggestSongsRecentPlayInterval);
+        }
+
+        this.suggestSongsRecentPlayInterval = window.setInterval(() => {
+            this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
+                .subscribe(result => {
+                    this.suggestSongsRecentFoundSongsResult = result;
+                });
+        }, this.appConfig.suggestListIntervalMs);
+    }
+
+    private setSongsAbandonedAutoPlay(): void {
+        if (this.suggestSongsAbandonedPlayInterval) {
+            window.clearInterval(this.suggestSongsAbandonedPlayInterval);
+        }
+
+        this.suggestSongsAbandonedPlayInterval = window.setInterval(() => {
+            this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
+                .subscribe(result => {
+                    this.suggestSongsAbandonedFoundSongsResult = result;
+                });
+        }, this.appConfig.suggestListIntervalMs);
     }
 
     private suggestSongsPopularAutoPlayToggle(): void {
@@ -310,6 +507,11 @@ export class SbConcertContainerComponent implements OnInit {
     }
 
     private suggestSongsPopularAutoPlayStart(): void {
+
+        if (this.suggestSongsPopularFoundPlayInterval) {
+            window.clearInterval(this.suggestSongsPopularFoundPlayInterval);
+        }
+
         this.suggestSongsPopularFoundPlayInterval = window.setInterval(() => {
 
             if (this.suggestSongsPopularDataFilter.offset + this.appConfig.suggestListRowsLimit >= this.appConfig.suggestSongsPopularResetLimit) {
@@ -349,6 +551,22 @@ export class SbConcertContainerComponent implements OnInit {
 
     private fetchSongsPopular(filter: AppDataFilter): Observable<AppApiResult<SbPopularItem>> {
         return this.songRepository.findSongsPopular(filter);
+    }
+
+    private fetchSongsRecent(startDate: Date, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+        return this.songRepository.findSongsRecent(startDate, filter);
+    }
+
+    private fetchSongsAbandoned(startDate: Date, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+        return this.songRepository.findSongsAbandoned(startDate, filter);
+    }
+
+    private fetchSongsBefore(song: SbSong, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+        return this.songRepository.findSongsBefore(song, filter);
+    }
+
+    private fetchSongsAfter(song: SbSong, filter: AppDataFilter): Observable<AppApiResult<SbSuggestItem>> {
+        return this.songRepository.findSongsAfter(song, filter);
     }
 
     private fetchTags(tagListDataFilter: AppDataFilter): Observable<AppApiResult<SbTag>> {

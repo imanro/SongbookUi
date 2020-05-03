@@ -26,7 +26,7 @@ export abstract class SbBaseRepository {
     }
 
 
-    protected getApiUrl(path: string, filter?: AppDataFilter): string {
+    protected getApiUrl(path: string, filter?: AppDataFilter, isFilterWhereAsParams = false): string {
         let url = this.appConfig.apiUrl + path;
 
         const params = [];
@@ -37,20 +37,29 @@ export abstract class SbBaseRepository {
                 params.push('search=' + filter.where.search);
             }
 
+
             if (filter.where && filter.where.getFields()) {
-                const filterParams = [];
-                for (const fieldDef of filter.where.getFields()) {
-                    let op;
-                    if (fieldDef.op === '=') {
-                        op = 'eq';
-                    } else if (fieldDef.op === '!=') {
-                        op = 'neq';
-                    } else {
-                        op = fieldDef.op;
+                if (isFilterWhereAsParams) {
+
+                    for (const fieldDef of filter.where.getFields()) {
+                        params.push(fieldDef.field + '=' + (Array.isArray(fieldDef.value) ? fieldDef.value.join(',') : fieldDef.value));
                     }
-                    filterParams.push(fieldDef.field + ':' + (Array.isArray(fieldDef.value) ? fieldDef.value.join(',') : fieldDef.value) + ':' + op);
+
+                } else {
+                    const filterParams = [];
+                    for (const fieldDef of filter.where.getFields()) {
+                        let op;
+                        if (fieldDef.op === '=') {
+                            op = 'eq';
+                        } else if (fieldDef.op === '!=') {
+                            op = 'neq';
+                        } else {
+                            op = fieldDef.op;
+                        }
+                        filterParams.push(fieldDef.field + ':' + (Array.isArray(fieldDef.value) ? fieldDef.value.join(',') : fieldDef.value) + ':' + op);
+                    }
+                    params.push('filter=' + filterParams.join(';'));
                 }
-                params.push('filter=' + filterParams.join(';'));
             }
 
             if (filter.limit && filter.limit > 0) {

@@ -1,41 +1,74 @@
 @import 'src/styles/variables';
 @import 'src/styles/mixins';
 
-:host {
-    display: block;
+%item {
+    display: flex; // because of unequal space using "fxFlex"
+    border-radius: 4px;
+    background: $sb-item-bg-color;
 
-    .item {
-        display: flex; // because of unequal space using "fxFlex"
-        border-radius: 4px;
-        background: $sb-item-bg-color;
+    &.selected {
+        background: $sb-item-selected-bg-color;
+    }
 
-        .title {
+    .title {
+        @include sb-custom-control();
+        flex: 2 0 100px;
+    }
+
+    .select-action {
+        display: flex;
+
+        mat-icon {
             @include sb-custom-control();
-            flex: 2 0 100px;
-        }
+            color: $sb-icon-action-color;
+            font-size: 16px;
+            width: 16px;
+            min-width: 16px;
+            height: 16px;
+            min-height: 16px;
 
-        .actions {
-            flex: 1 0 100px;
-            display: flex;
-            place-content: flex-end;
-
-            mat-icon {
-                display: flex;
-                flex: 0 0 auto;
-
-                @include sb-custom-control();
-                color: $sb-icon-action-color;
-                font-size: 18px;
-                line-height: 17px;
-                min-height: 17px;
-                height: 17px;
-
-                &.draggable {
-                    cursor: move;
-                    cursor: grab;
-                }
+            &.selected {
+                color: $sb-icon-action-active-color;
             }
         }
     }
 
+    .actions {
+        flex: 1 0 100px;
+        display: flex;
+        place-content: flex-end;
+
+        mat-icon {
+            display: flex;
+            flex: 0 0 auto;
+
+            @include sb-custom-control();
+            color: $sb-icon-action-color;
+            font-size: 18px;
+            line-height: 17px;
+            min-height: 17px;
+            height: 17px;
+
+            &.draggable {
+                cursor: move;
+                cursor: grab;
+            }
+        }
+    }
+}
+
+:host {
+    display: block;
+
+    .container {
+        .item {
+            @extend %item;
+        }
+    }
+
+}
+
+.cdk-drag-preview {
+    @extend %item;
+    background: $sb-item-selected-bg-color;
 }
