@@ -55,10 +55,10 @@ export class SbSongContentRepository extends SbBaseRepository {
 
     pdfCompile(contents: SbSongContent[]): void {
         const ids: number[] = [];
-        contents.map(curContent => {
-            ids.push(curContent.id);
-        });
 
+        for (const content of contents) {
+            ids.push(content.id);
+        }
 
         const url = this.getApiUrl('/song-content/pdfCompile?ids=' + ids.join(','));
 

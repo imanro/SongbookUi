@@ -37,5 +37,16 @@
             }
         }
     }
+}
 
+.progress-bar-container {
+    height: 5px;
+    position: sticky;
+    top: 0;
+}
+
+.form-errors-wrapper {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }

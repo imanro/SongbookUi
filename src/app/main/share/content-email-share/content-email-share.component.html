@@ -34,12 +34,16 @@
         </ng-container>
     </ul>
 
-    <div class="checkboxes" fxLayout="column" class="mb-16">
+    <div class="checkboxes" fxLayout="column">
         <mat-checkbox formControlName="isEmbedContent">Embed content into mail when it's possible?</mat-checkbox>
         <mat-checkbox formControlName="isAddSequenceToFileNames">Rename files adding sequence numbers to them?</mat-checkbox>
     </div>
 
-    <div class="form-controls">
+    <ul *ngIf="commonFormErrors.length > 0" class="form-errors-wrapper mt-16">
+        <li *ngFor="let error of commonFormErrors"><mat-error>{{error}}</mat-error></li>
+    </ul>
+
+    <div class="form-controls mt-16">
         <button type="submit" mat-flat-button color="primary" [disabled]="isLoading">Send</button>
     </div>
 

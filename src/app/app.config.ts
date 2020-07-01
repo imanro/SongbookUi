@@ -6,16 +6,22 @@ import { environment } from '../environments/environment';
 
 export interface IAppConfig {
     mockDelayMs: number;
+    snackBarDelayMs: number;
     modalSize: string;
     apiUrl: string;
     // appVersion: string;
     listRowsLimit: number;
+    suggestListRowsLimit: number;
+    suggestListIntervalMs: number;
+    suggestSongsPopularResetLimit: number;
 }
 
 @Injectable()
 export class AppConfig implements IAppConfig {
 
     mockDelayMs = 1000;
+
+    snackBarDelayMs = 2000;
 
     modalSize = 'lg';
 

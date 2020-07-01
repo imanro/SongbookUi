@@ -23,7 +23,7 @@ import {SongListModule} from '../../shared/modules/song-list/song-list.module';
 import {SongTextSearchModule} from '../../shared/modules/song-text-search/song-text-search.module';
 import {SongTagListModule} from '../../shared/modules/song-tag-list/song-tag-list.module';
 import {SbSongHeaderModule} from '../../shared/modules/song-header/song-header.module';
-import {SbSongContentItemsModule} from '../../shared/modules/song-content/song-content-items.module';
+import {SbSongContentItemsModule} from '../../shared/modules/song-content-items/song-content-items.module';
 
 @NgModule({
     declarations: [

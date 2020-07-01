@@ -1,29 +1,32 @@
 <div class="page-layout simple fullwidth song-content">
     <div class="content p-24">
-        <div class="progress-bar-container">
-            <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
+        <div class="mat-card mat-elevation-z4">
+            <div class="progress-bar-container">
+                <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
+            </div>
+
+            <h3 class="m-0 mb-4 px-20">Select by content type:</h3>
+            <sb-song-content-select-controls
+                (typeSelect)="handleSongContentTypeSelect($event)"
+                (typeUnselect)="handleSongContentTypeUnSelect($event)"
+                class="mb-12 px-20"
+            ></sb-song-content-select-controls>
+
+            <sb-song-content-action-controls
+                (contentViaEmailShare)="handleContentViaEmailShare()"
+                (pdfCompile)="handlePdfCompile()"
+                class="mb-12 px-20"
+            ></sb-song-content-action-controls>
+
+            <sb-song-detailed-list
+                [songs]="songs"
+                [itemsSelected]="contentItemsSelected"
+                [isLoading]="isLoading"
+                (itemSelect)="handleSongContentItemSelect($event)"
+                (itemUnSelect)="handleSongContentItemUnSelect($event)"
+                (songContentSync)="handleSongContentSync($event)"
+                class="px-20 pb-20"
+            ></sb-song-detailed-list>
         </div>
-
-        <h3 class="m-0 mb-4">Select by content type:</h3>
-        <sb-song-content-select-controls
-            (typeSelect)="handleSongContentTypeSelect($event)"
-            (typeUnselect)="handleSongContentTypeUnSelect($event)"
-            class="mb-12"
-        ></sb-song-content-select-controls>
-
-        <sb-song-content-action-controls
-            (contentViaEmailShare)="handleContentViaEmailShare()"
-            (pdfCompile)="handlePdfCompile()"
-            class="mb-12"
-        ></sb-song-content-action-controls>
-
-        <sb-song-detailed-list
-            [songs]="songs"
-            [itemsSelected]="contentItemsSelected"
-            [isLoading]="isLoading"
-            (itemSelect)="handleSongContentItemSelect($event)"
-            (itemUnSelect)="handleSongContentItemUnSelect($event)"
-            (songContentSync)="handleSongContentSync($event)"
-        ></sb-song-detailed-list>
     </div>
 </div>

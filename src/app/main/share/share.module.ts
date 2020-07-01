@@ -9,9 +9,9 @@ import {
     MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressBarModule
+    MatProgressBarModule, MatSnackBarModule
 } from '@angular/material';
-import {SbSongContentItemsModule} from '../../shared/modules/song-content/song-content-items.module';
+import {SbSongContentItemsModule} from '../../shared/modules/song-content-items/song-content-items.module';
 
 @NgModule({
     declarations: [SbShareContainerComponent, ContentEmailShareComponent],
@@ -24,6 +24,7 @@ import {SbSongContentItemsModule} from '../../shared/modules/song-content/song-c
         MatInputModule,
         MatCheckboxModule,
         MatFormFieldModule,
+        MatSnackBarModule,
         MatButtonModule
     ]
 })

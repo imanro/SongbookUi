@@ -4,15 +4,18 @@ import {SbSettings} from '../../shared/models/settings.model';
 import {SbSettingsRepository} from '../../shared/repositories/settings.repository';
 import {SbConcertRepository} from '../../shared/repositories/concert.repository';
 import {SbConcert} from '../../shared/models/concert.model';
-
-import { Component, OnInit } from '@angular/core';
-import {combineLatest, Subject} from 'rxjs';
-import {ActivatedRoute, Router, UrlSegment} from '@angular/router';
+import {AppConfig} from '../../app.config';
 import {SbSongContentEmailShare} from '../../shared/models/song-content-email-share.model';
 import {SbShareRepository} from '../../shared/repositories/share.repository';
-import {finalize} from 'rxjs/operators';
 import {SbFormErrors} from '../../shared/models/form-errors.model';
 import {SbFormsService} from '../../shared/services/forms.service';
+
+import { Component, OnInit } from '@angular/core';
+import {combineLatest, interval, Subject} from 'rxjs';
+import {ActivatedRoute, Router, UrlSegment} from '@angular/router';
+import {finalize} from 'rxjs/operators';
+import {MatSnackBar} from '@angular/material';
+
 
 @Component({
     selector: 'sb-share-container',
@@ -32,16 +35,17 @@ export class SbShareContainerComponent implements OnInit {
     formErrors$ = new Subject<SbFormErrors>();
 
     isLoading = false;
-    // several settings entities
 
     constructor(
+        private appConfig: AppConfig,
         private route: ActivatedRoute,
         private router: Router,
         private concertRepository: SbConcertRepository,
         private contentRepository: SbSongContentRepository,
         private settingRepository: SbSettingsRepository,
         private shareRepository: SbShareRepository,
-        private formsService: SbFormsService
+        private formsService: SbFormsService,
+        private snackBar: MatSnackBar
     ) {
     }
 
@@ -62,8 +66,16 @@ export class SbShareContainerComponent implements OnInit {
                     this.isLoading = false;
                 })
             )
-            .subscribe(() => {}, err => {
+            .subscribe(() => {
+                this.snackBar.open('The mail sent', 'Ok', {
+                    duration: this.appConfig.snackBarDelayMs,
+                });
+
+            }, err => {
                 const formErrors = this.createFormErrors();
+
+                formErrors.common.push('An error has occurred during the form sending');
+
                 const message = err.message;
                 formErrors.common.push(message);
                 this.formsService.assignServerFieldErrors(err.formErrors, formErrors);
@@ -117,6 +129,11 @@ export class SbShareContainerComponent implements OnInit {
     private loadConcert(id: number): void {
         this.concertRepository.findConcert(id).subscribe(concert => {
             this.concert = concert;
+            /*
+            interval(2000).subscribe(() => {
+                this.assignFormErrorsDummy();
+            });
+             */
         });
     }
 
@@ -130,5 +147,14 @@ export class SbShareContainerComponent implements OnInit {
 
     private createFormErrors() {
         return new SbFormErrors();
+    }
+
+    private assignFormErrorsDummy(): void {
+        const formErrors = this.createFormErrors();
+        const message = "The message";
+        console.log('put', formErrors);
+        formErrors.common.push(message);
+        this.formErrors$.next(formErrors);
+
     }
 }

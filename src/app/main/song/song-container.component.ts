@@ -225,29 +225,13 @@ export class SbSongContainerComponent implements OnInit {
 
         if (this.songListSearchTags.find(curTag => curTag.id === tag.id) === undefined) {
             this.songListSearchTags.push(tag);
-
-            this.isLoading = true;
-
-            this.fetchSongs()
-                .pipe(finalize(() => {
-                    this.isLoading = false;
-                }))
-                .subscribe(() => {
-                    }
-                );
+            this.changeDataFilter(this.songsListDataFilter, true);
         }
     }
 
     handleSongListSearchTagRemove(tag: SbTag): void {
         this.songListSearchTags = this.songListSearchTags.filter(curTag => curTag.id !== tag.id);
-
-        this.fetchSongs()
-            .pipe(finalize(() => {
-                this.isLoading = false;
-            }))
-            .subscribe(() => {
-                }
-            );
+        this.changeDataFilter(this.songsListDataFilter, true);
     }
 
     handleSongListSearchTagSearch(searchString: string): void {
@@ -270,10 +254,10 @@ export class SbSongContainerComponent implements OnInit {
         this.user.id = 1;
     }
 
-    private changeDataFilter(dataFilter: AppDataFilter): void {
+    private changeDataFilter(dataFilter: AppDataFilter, isForceOffsetReset = false): void {
         const whereEq = JSON.stringify(this.songsListDataFilter.where) === JSON.stringify(this.songsListDataFilterPrevInstance.where);
 
-        if (!whereEq) {
+        if (!whereEq || isForceOffsetReset) {
             dataFilter.offset = 0;
         }
 

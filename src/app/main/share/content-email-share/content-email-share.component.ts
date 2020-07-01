@@ -124,12 +124,13 @@ export class ContentEmailShareComponent implements OnInit, OnDestroy {
 
     private assignFormErrors(): void {
         this.commonFormErrors = [];
+        console.log('ass');
 
         if (this.formErrors$) {
             this.formErrors$
                 .pipe(takeUntil(this.unsubscribe$))
                 .subscribe(formErrors => {
-
+                    console.log('came', formErrors);
                     if (formErrors) {
                         const unmapped = this.formService.bindErrors(formErrors, this.shareForm);
 

@@ -1,17 +1,21 @@
 <div class="page-layout simple fullwidth song-content">
     <div class="content p-24">
-        <div class="progress-bar-container">
-            <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
-        </div>
-        <h2 class="m-0 mb-32">Share via e-mail</h2>
+        <div class="mat-card mat-elevation-z4">
+            <div class="progress-bar-container">
+                <mat-progress-bar [color]="'accent'" [mode]="'indeterminate'" *ngIf="isLoading"></mat-progress-bar>
+            </div>
+            <h2 class="m-0 mb-32 px-20">Share via e-mail</h2>
 
-        <sb-content-email-share
-            [contents]="songContents"
-            [concert]="concert"
-            [settings]="settings"
-            [isLoading]="isLoading"
-            [formErrors$]="formErrors$"
-            (emailShare)="handleEmailShare($event)"
-            *ngIf="songContents && settings && concert"></sb-content-email-share>
+            <sb-content-email-share
+                [contents]="songContents"
+                [concert]="concert"
+                [settings]="settings"
+                [isLoading]="isLoading"
+                [formErrors$]="formErrors$"
+                (emailShare)="handleEmailShare($event)"
+                class="px-20 pb-20"
+                *ngIf="settings && concert"
+            ></sb-content-email-share>
+        </div>
     </div>
 </div>

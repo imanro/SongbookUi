@@ -78,7 +78,8 @@
                 display: flex;
                 flex-direction: column;
                 flex: 1;
-                overflow: auto;
+                // overflow: auto;
+                overflow: visible;
                 place-content: stretch;
 
                 .mat-card {
@@ -101,7 +102,7 @@ $carded-header-height-without-toolbar: $carded-header-height - $carded-toolbar-h
 
 .page-layout {
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; */
 
     // Carded layout
     &.carded {
