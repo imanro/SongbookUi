@@ -10,7 +10,7 @@ import {
 } from '@angular/material';
 import {SongListModule} from '../../shared/modules/song-list/song-list.module';
 import {SongTextSearchModule} from '../../shared/modules/song-text-search/song-text-search.module';
-import {SongHeaderModule} from '../../shared/modules/song-header/song-header.module';
+import {SbSongHeaderModule} from '../../shared/modules/song-header/song-header.module';
 import {SongTagListModule} from '../../shared/modules/song-tag-list/song-tag-list.module';
 import {FuseSharedModule} from '../../../@fuse/shared.module';
 import { ConcertSummaryComponent } from './concert-summary/concert-summary.component';
@@ -40,7 +40,7 @@ import { SuggestedControlsDateComponent } from './suggested-controls-date/sugges
         MatIconModule,
         SbUiUtilsModule,
         SongListModule,
-        SongHeaderModule,
+        SbSongHeaderModule,
         SongTextSearchModule,
         SongTagListModule
     ]

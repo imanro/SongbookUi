@@ -10,7 +10,7 @@ import {SbSongContentService} from './song-content.service';
 export class SbSongContentVideoService extends SbSongContentService{
 
     getSongContentVideo(song: SbSong): SbSongContent[] {
-        return song.content.filter(currentContent => currentContent.type === SbSongContentTypeEnum.LINK && currentContent.content.match(/(?:youtube|godtube)/i) );
+        return song.content.filter(currentContent => this.isContentVideo(currentContent) );
     }
 
     getSongContentVideoSrc(url: string, params: {[index: string]: string|number}): string {

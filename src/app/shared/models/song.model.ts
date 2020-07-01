@@ -6,6 +6,7 @@ export class SbSong extends AppDataModel {
     id: number;
     title: string;
     author: string;
+    code: string;
     copyright: string;
     createTime: Date;
     updateTime: Date;

@@ -1,4 +1,4 @@
- <mat-table [dataSource]="songs">
+<mat-table [dataSource]="songs">
         <!-- Position Column -->
         <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef fxFlex="0 0 100px"> Id </mat-header-cell>
@@ -23,10 +23,9 @@
 
      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
      <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="handleSongSelect(row)"></mat-row>
-    </mat-table>
-    <mat-paginator [length]="songsCount"
-                   [pageSize]="dataFilter.limit"
-                   [pageIndex]="dataFilter.getPage(true)"
-                   [hidePageSize]="true"
-                   (page)="handlePageChange($event)"
-    ></mat-paginator>
+</mat-table>
+<mat-paginator [length]="songsCount"
+                [pageSize]="dataFilter.limit"
+                [pageIndex]="dataFilter.getPage(true)"
+                [hidePageSize]="true"
+                (page)="handlePageChange($event)"></mat-paginator>

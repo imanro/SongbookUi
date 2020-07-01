@@ -1,0 +1,1 @@
+<mat-checkbox class="mt-24" *ngFor="let type of allTypes" (change)="handleTypeToggle($event, type)" [checked]="isTypeChecked(type)">{{type.title}}</mat-checkbox>

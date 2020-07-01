@@ -55,7 +55,7 @@
                             <button mat-flat-button color="accent" (click)="handleConcertAddFormToggle()">New Performance</button>
                             <button mat-stroked-button color="primary">Group</button>
                             <button mat-stroked-button color="primary">Ungroup</button>
-                            <button mat-flat-button color="primary">Go to Files</button>
+                            <button mat-flat-button color="primary" (click)="handleGoToSongContent()">Go to Files</button>
                         </div>
                         <div class="concert-add-container mt-8" *ngIf="isConcertAddFormShown">
                             <sb-concert-add class="p-8"

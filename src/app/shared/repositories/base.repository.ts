@@ -127,8 +127,8 @@ export abstract class SbBaseRepository {
 
             } else {
 
-                if (error.error && error.error.error) {
-                    const container = error.error.error;
+                if (error.error) {
+                    const container = error.error;
 
                     if (container.message) {
                         appError.message = container.message;
@@ -137,9 +137,9 @@ export abstract class SbBaseRepository {
                     // 401: invalid access token: throw this error
 
                     // fieldErrors processing
-                    if (error.status === 422) {
-                        if (container.details && container.details.messages) {
-                            appError.formErrors = container.details.messages;
+                    if (error.status === 400) {
+                        if (container.fields) {
+                            appError.formErrors = container.fields;
                         }
                     }
                 }

@@ -7,10 +7,13 @@ import {SbSongService} from '../../../services/song.service';
     templateUrl: './song-header.component.html',
     styleUrls: ['./song-header.component.scss']
 })
-export class SongHeaderComponent implements OnInit, OnChanges {
+export class SbSongHeaderComponent implements OnInit, OnChanges {
 
     @Input()
     song: SbSong;
+
+    @Input()
+    isShowAllHeaders = true;
 
     constructor(
         private songService: SbSongService

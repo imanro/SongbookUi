@@ -40,7 +40,6 @@ export class SuggestedControlsDateComponent implements OnInit {
     }
 
     private assignFormValues(): void {
-        console.log('set the date:', this.suggestedDate);
         this.suggestedControlsForm.patchValue({
             suggestedDate: this.suggestedDate
         });

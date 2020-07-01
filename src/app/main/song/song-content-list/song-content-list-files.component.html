@@ -2,7 +2,9 @@
     <!-- Position Column -->
     <ng-container matColumnDef="fileName">
         <mat-header-cell *matHeaderCellDef fxFlex="1 1 auto" class="col-name"> Name </mat-header-cell>
-        <mat-cell *matCellDef="let item" fxFlex="1 1 auto" class="col-name"><a [href]="getContentOpenUrl(item)"><div [attr.style]="getContentIconStyle(item)" class="icon"></div> {{item.fileName}}</a></mat-cell>
+        <mat-cell *matCellDef="let item" fxFlex="1 1 auto" class="col-name">
+            <sb-song-content-gdrive-file [item]="item"></sb-song-content-gdrive-file>
+        </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="createTime">

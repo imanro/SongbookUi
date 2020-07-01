@@ -1,5 +1,5 @@
 <ng-container *ngIf="song">
 <h2 class="m-0">{{songHeader}}</h2>
 
-<div class="alt-headers secondary-text mt-24" *ngIf="allSongHeadersString.length > 0">{{allSongHeadersString}}</div>
+<div class="alt-headers secondary-text mt-24" *ngIf="isShowAllHeaders && allSongHeadersString.length > 0">{{allSongHeadersString}}</div>
 </ng-container>

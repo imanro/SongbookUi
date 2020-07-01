@@ -1,0 +1,53 @@
+<form fxLayout="column" fxLayoutAlign="start"
+      fxFlex="1 0 auto" fxFlex.gt-sm="0 0 50%" [formGroup]="shareForm" (ngSubmit)="handleEmailShare()">
+
+    <mat-form-field fxFlex="1 1 auto"
+                    *ngIf="getShareFormField('mailRecipients'); let toInput;">
+        <mat-label>To</mat-label>
+        <input matInput formControlName="mailRecipients">
+        <mat-error *ngIf="toInput.hasError('required')"><span class="text">Mandatory</span></mat-error>
+        <mat-error *ngIf="toInput.hasError('server')"><span class="text">{{toInput.getError('server')}}</span></mat-error>
+    </mat-form-field>
+
+    <mat-form-field fxFlex="1 1 auto"
+                    *ngIf="getShareFormField('mailSubject'); let subjectInput;">
+        <mat-label>Subject</mat-label>
+        <input matInput formControlName="mailSubject">
+        <mat-error *ngIf="subjectInput.hasError('required')"><span class="text">Mandatory</span></mat-error>
+        <mat-error *ngIf="subjectInput.hasError('server')"><span class="text">{{subjectInput.getError('server')}}</span></mat-error>
+    </mat-form-field>
+
+    <mat-form-field fxFlex="1 1 auto"
+                    *ngIf="getShareFormField('mailBody'); let bodyInput;">
+        <textarea matInput formControlName="mailBody"></textarea>
+        <mat-error *ngIf="bodyInput.hasError('required')"><span class="text">Mandatory</span></mat-error>
+        <mat-error *ngIf="bodyInput.hasError('server')"><span class="text">{{bodyInput.getError('server')}}</span></mat-error>
+    </mat-form-field>
+
+    <h3>Files:</h3>
+
+    <ul *ngIf="contents" class="content-container mb-16">
+        <ng-container *ngFor="let item of contents">
+            <li class="mb-4">
+                <sb-song-content-view [item]="item"></sb-song-content-view>
+            </li>
+        </ng-container>
+    </ul>
+
+    <div class="checkboxes" fxLayout="column" class="mb-16">
+        <mat-checkbox formControlName="isEmbedContent">Embed content into mail when it's possible?</mat-checkbox>
+        <mat-checkbox formControlName="isAddSequenceToFileNames">Rename files adding sequence numbers to them?</mat-checkbox>
+    </div>
+
+    <div class="form-controls">
+        <button type="submit" mat-flat-button color="primary" [disabled]="isLoading">Send</button>
+    </div>
+
+<!-- Get subject, body by settings -->
+
+<!-- Plus checkboxes to embed the content -->
+
+<!-- !!!Plus names of the items of current concert! (add concertId parameter to get its songs -> headers) -->
+
+<!-- Display embedable content on the bottom -->
+</form>

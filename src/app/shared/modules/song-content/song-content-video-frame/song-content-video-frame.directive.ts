@@ -1,11 +1,13 @@
+import {SbSongContentVideoService} from '../../../services/song-content-video.service';
+
 import {Directive, ElementRef, HostBinding, Input, OnInit, Renderer2} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
-import {SbSongContentVideoService} from '../../../shared/services/song-content-video.service';
 
 @Directive({
-    selector: '[sbSongContentVideoFrame]'
+  selector: '[sbSongContentVideoFrame]'
 })
-export class SongContentVideoFrameDirective implements OnInit {
+export class SbSongContentVideoFrameDirective implements OnInit {
+
 
     @Input() url: string;
 
@@ -53,5 +55,4 @@ export class SongContentVideoFrameDirective implements OnInit {
         this.src = this.sanitizer.bypassSecurityTrustResourceUrl(this.songContentVideoService.getSongContentVideoSrc(this.url,
             {height: this.height, width: this.width, aspectRatio: ar}));
     }
-
 }

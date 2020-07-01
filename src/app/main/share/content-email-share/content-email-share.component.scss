@@ -1,0 +1,13 @@
+:host {
+    display: flex;
+
+    .content-container {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    textarea {
+        min-height: 10Em;
+    }
+}

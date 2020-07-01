@@ -1,0 +1,22 @@
+<ng-container *ngFor="let song of songs">
+
+    <div class="header-container mb-8" fxLayoutAlign="start center" >
+        <sb-song-header [song]="song" [isShowAllHeaders]="false" fxFlex="0 0 auto"></sb-song-header><div class="song-code" fxFlex="0 0 auto">[{{song.code}}]</div>
+    </div>
+
+    <button mat-icon-button aria-label="refresh" color="accent" fxFlex="0 0 auto"
+            [disabled]="isLoading"
+            (click)="handleSongContentRefresh(song)"
+    >
+        <mat-icon >refresh</mat-icon>
+    </button>
+
+<!--    and, now, go by each item of song content and either out gdrive link or video -->
+    <ul *ngIf="song.content" class="content-container mb-32">
+        <ng-container *ngFor="let item of song.content">
+            <li *ngIf="isExternalContent(item)" class="mb-4 p-4" [ngClass]="{selected: isItemSelected(item)}" (click)="handleItemSelectToggle(item)">
+                <sb-song-content-view [item]="item"></sb-song-content-view>
+            </li>
+        </ng-container>
+    </ul>
+</ng-container>

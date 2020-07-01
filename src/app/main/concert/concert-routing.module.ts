@@ -9,7 +9,6 @@ const routes = [
         pathMatch: 'full'
     },
     {
-        // new song form
         path     : ':concertId',
         component: SbConcertContainerComponent,
         pathMatch: 'full',

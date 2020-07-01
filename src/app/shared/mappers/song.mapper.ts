@@ -18,6 +18,7 @@ export class SbSongMapper extends SbBaseEntityMapperAbstract<SbSong> {
         entity.createTime = row.createTime;
         entity.updateTime = row.updateTime;
         entity.copyright = row.copyright;
+        entity.code = row.code;
 
         entity.headers = [];
         if (row.headers) {

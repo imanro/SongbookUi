@@ -11,8 +11,6 @@ export class SbFormsService {
 
         let unmapped = [];
 
-        console.log('PPPP', errors.fields, errors.common);
-
         for (const fieldError of errors.fields) {
 
             const fieldName = this.getFieldName(fieldError.name, fieldMap);
@@ -66,5 +64,17 @@ export class SbFormsService {
         }
 
         errors.fields.push({name: field, messages: [message]});
+    }
+
+    assignServerFieldErrors(errors: { [key: string]: any }[], formErrors: SbFormErrors): void {
+        formErrors.fields = [];
+
+        if (errors) {
+            for (const key of Object.keys(errors)) {
+                if (errors.hasOwnProperty(key)) {
+                    formErrors.fields.push({name: key, messages: [errors[key]]});
+                }
+            }
+        }
     }
 }

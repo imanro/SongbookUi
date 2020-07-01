@@ -1,19 +1,17 @@
-import { Injectable} from '@angular/core';
 import {SbBaseRepository} from './base.repository';
 import {AppDataFilter} from '../models/data-filter.model';
-import {Observable} from 'rxjs';
 import {SbSong} from '../models/song.model';
 import {AppApiResult} from '../models/api-result.model';
 import {SbTag} from '../models/tag.model';
-import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../models/data-filter-where.model';
-import {catchError, delay, map} from 'rxjs/operators';
-import {HttpClient} from '@angular/common/http';
-import {AppConfig} from '../../app.config';
 import {SbSongMapper} from '../mappers/song.mapper';
 import {SbPopularItemMapper} from '../mappers/popular-item.mapper';
 import {SbPopularItem} from '../models/popular-item.model';
 import {SbSuggestItem} from '../models/suggest-item.model';
 import {SbSuggestItemMapper} from '../mappers/suggest-item.mapper';
+
+import { Injectable} from '@angular/core';
+import {catchError, map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -34,6 +32,23 @@ export class SbSongRepository extends SbBaseRepository {
             .pipe(
                 map<any, SbSong>(row => {
                     return this.mapDataToSong(row);
+                })
+            );
+    }
+
+    findMultipleSongs(ids: number[]): Observable<SbSong[]> {
+        const url = this.getApiUrl('/song/multiple/?ids=' + ids.join(','));
+
+        return this.http.get<SbSong[]>(url)
+            .pipe(
+                map<any, SbSong[]>(response => {
+                    const songs: SbSong[] = [];
+
+                    for (const row of response) {
+                        songs.push(this.mapDataToSong(row));
+                    }
+
+                    return songs;
                 })
             );
     }
@@ -200,6 +215,16 @@ export class SbSongRepository extends SbBaseRepository {
                     }
 
                     return result;
+                })
+            );
+    }
+
+    syncSongContent(song: SbSong): Observable<SbSong> {
+        const url = this.getApiUrl('/song/syncCloudContent/' + song.id);
+        return this.http.patch(url, {}, this.getDefaultHttpPostOptions())
+            .pipe(
+                map(row => {
+                    return this.mapDataToSong(row);
                 })
             );
     }

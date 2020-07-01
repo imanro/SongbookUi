@@ -84,6 +84,5 @@ export function initializeApp(appConfig: AppConfig): () => void {
         AppComponent
     ]
 })
-export class AppModule
-{
+export class AppModule {
 }

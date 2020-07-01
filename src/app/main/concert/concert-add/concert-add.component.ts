@@ -1,13 +1,11 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {CustomValidators} from 'ng2-validation';
-import {Subject} from 'rxjs';
 import {SbFormErrors} from '../../../shared/models/form-errors.model';
-import {SbSongContentTypeEnum} from '../../../shared/enums/song-content.type.enum';
 import {SbFormsService} from '../../../shared/services/forms.service';
-import {takeUntil} from 'rxjs/operators';
-import {SbSongContent} from '../../../shared/models/song-content.model';
 import {SbConcert} from '../../../shared/models/concert.model';
+
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {takeUntil} from 'rxjs/operators';
+import {AbstractControl, FormBuilder, FormGroup} from '@angular/forms';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'sb-concert-add',
@@ -44,7 +42,6 @@ export class ConcertAddComponent implements OnInit, OnDestroy {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
-
 
     private buildForm(): void {
         this.concertAddForm = this.fb.group({

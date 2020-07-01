@@ -10,6 +10,23 @@ import {catchError, map} from 'rxjs/operators';
 })
 export class SbSongContentRepository extends SbBaseRepository {
 
+    findSongContents(ids: number[]): Observable<SbSongContent[]> {
+        const url = this.getApiUrl('/song-content/?ids=' + ids.join(','));
+
+        return this.http.get(url)
+            .pipe(
+                map<any, SbSongContent[]>(response => {
+                    const contents: SbSongContent[] = [];
+
+                    for (const row of response) {
+                        contents.push(this.mapToEntity(row));
+                    }
+
+                    return contents;
+                }),
+            );
+    }
+
     save(entity: SbSongContent): Observable<SbSongContent> {
 
         const url = this.getApiUrl('/song-content');
@@ -34,6 +51,22 @@ export class SbSongContentRepository extends SbBaseRepository {
             .pipe(
                 catchError(this.handleHttpError<SbSongContent>())
             );
+    }
+
+    pdfCompile(contents: SbSongContent[]): void {
+        const ids: number[] = [];
+        contents.map(curContent => {
+            ids.push(curContent.id);
+        });
+
+
+        const url = this.getApiUrl('/song-content/pdfCompile?ids=' + ids.join(','));
+
+        if (ids.length > 0) {
+            window.location.href = url;
+        } else {
+            console.error('Empty contents list given');
+        }
     }
 
 

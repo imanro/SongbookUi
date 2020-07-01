@@ -1,14 +1,10 @@
-import {Component, OnInit} from '@angular/core';
 import {AppDataFilterWhere, AppDataFilterWhereFieldOpEnum} from '../../shared/models/data-filter-where.model';
 import {SbTag} from '../../shared/models/tag.model';
 import {AppDataFilter} from '../../shared/models/data-filter.model';
-import {finalize} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {interval, Observable, Subject, Subscription} from 'rxjs';
 import {SbSongRepository} from '../../shared/repositories/song.repository';
 import {SbSong} from '../../shared/models/song.model';
 import {SbTagRepository} from '../../shared/repositories/tag.repository';
-import {cloneDeep} from 'lodash';
-import * as moment from 'moment';
 import {AppConfig} from '../../app.config';
 import {SbConcertRepository} from '../../shared/repositories/concert.repository';
 import {SbConcert} from '../../shared/models/concert.model';
@@ -18,6 +14,12 @@ import {SbPopularItem} from '../../shared/models/popular-item.model';
 import {SbSongService} from '../../shared/services/song.service';
 import {SbSuggestItem} from '../../shared/models/suggest-item.model';
 import {SbUser} from '../../shared/models/user.model';
+
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {finalize, takeUntil} from 'rxjs/operators';
+import {cloneDeep} from 'lodash';
+import * as moment from 'moment';
 import {moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
@@ -25,7 +27,7 @@ import {moveItemInArray} from '@angular/cdk/drag-drop';
     templateUrl: './concert-container.component.html',
     styleUrls: ['./concert-container.component.scss']
 })
-export class SbConcertContainerComponent implements OnInit {
+export class SbConcertContainerComponent implements OnInit, OnDestroy {
 
     isLoading = false;
 
@@ -43,13 +45,13 @@ export class SbConcertContainerComponent implements OnInit {
 
     suggestSongsPopularFoundSongsResult: AppApiResult<SbPopularItem>;
 
-    suggestSongsPopularFoundPlayInterval: any = null;
+    suggestSongsPopularFoundPlayInterval: Subscription = null;
 
     suggestSongsPopularFormatter: (item: any, position: number) => string;
 
     suggestSongsRecentFoundSongsResult: AppApiResult<SbSuggestItem>;
 
-    suggestSongsRecentPlayInterval: any = null;
+    suggestSongsRecentPlayInterval: Subscription = null;
 
     suggestSongsRecentDataFilter: AppDataFilter;
 
@@ -57,7 +59,7 @@ export class SbConcertContainerComponent implements OnInit {
 
     suggestSongsAbandonedFoundSongsResult: AppApiResult<SbSuggestItem>;
 
-    suggestSongsAbandonedPlayInterval: any = null;
+    suggestSongsAbandonedPlayInterval: Subscription;
 
     suggestSongsAbandonedDataFilter: AppDataFilter;
 
@@ -87,12 +89,15 @@ export class SbConcertContainerComponent implements OnInit {
 
     user: SbUser;
 
+    unsubscribe$ = new Subject<void>();
+
     constructor(
         private appConfig: AppConfig,
         private songRepository: SbSongRepository,
         private tagRepository: SbTagRepository,
         private concertRepository: SbConcertRepository,
-        private songService: SbSongService
+        private songService: SbSongService,
+        private router: Router,
     ) {
     }
 
@@ -113,6 +118,11 @@ export class SbConcertContainerComponent implements OnInit {
         this.initSuggestSongsAfter();
         this.initSuggestSongsBefore();
         this.initNewConcert();
+    }
+
+    ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 
     handleSongTextSearch(value: string): void {
@@ -369,6 +379,15 @@ export class SbConcertContainerComponent implements OnInit {
         }
     }
 
+    handleGoToSongContent(): void {
+        if (this.operateConcert) {
+            this.router.navigate(['song-content/concert', this.operateConcert.id]);
+        } else {
+            console.error('The operate concert was not set');
+        }
+    }
+
+
     private processRouteParams(): void {
         // temporary assign last concert; in future - process concert id url param
         this.fetchLastConcert();
@@ -473,35 +492,43 @@ export class SbConcertContainerComponent implements OnInit {
 
     private setSongsRecentAutoPlay(): void {
         if (this.suggestSongsRecentPlayInterval) {
-            window.clearInterval(this.suggestSongsRecentPlayInterval);
+            this.suggestSongsRecentPlayInterval.unsubscribe();
         }
 
-        this.suggestSongsRecentPlayInterval = window.setInterval(() => {
-            this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
-                .subscribe(result => {
-                    this.suggestSongsRecentFoundSongsResult = result;
-                });
-        }, this.appConfig.suggestListIntervalMs);
+        this.suggestSongsRecentPlayInterval = interval(this.appConfig.suggestListIntervalMs)
+            .pipe(
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe(() => {
+                this.fetchSongsRecent(this.suggestSongsRecentStartDate, this.suggestSongsRecentDataFilter)
+                    .subscribe(result => {
+                        this.suggestSongsRecentFoundSongsResult = result;
+                    });
+            });
     }
 
     private setSongsAbandonedAutoPlay(): void {
         if (this.suggestSongsAbandonedPlayInterval) {
-            window.clearInterval(this.suggestSongsAbandonedPlayInterval);
+            this.suggestSongsAbandonedPlayInterval.unsubscribe();
+            this.suggestSongsAbandonedPlayInterval = null;
         }
 
-        this.suggestSongsAbandonedPlayInterval = window.setInterval(() => {
-            this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
-                .subscribe(result => {
-                    this.suggestSongsAbandonedFoundSongsResult = result;
-                });
-        }, this.appConfig.suggestListIntervalMs);
+        this.suggestSongsAbandonedPlayInterval = interval(this.appConfig.suggestListIntervalMs)
+            .pipe(
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe(() => {
+                this.fetchSongsAbandoned(this.suggestSongsAbandonedStartDate, this.suggestSongsAbandonedDataFilter)
+                    .subscribe(result => {
+                        this.suggestSongsAbandonedFoundSongsResult = result;
+                    });
+            });
     }
 
     private suggestSongsPopularAutoPlayToggle(): void {
         if (!!this.suggestSongsPopularFoundPlayInterval) {
             this.suggestSongsPopularAutoPlayStop();
         } else {
-            console.log('restart');
             this.suggestSongsPopularAutoPlayStart();
         }
     }
@@ -509,10 +536,15 @@ export class SbConcertContainerComponent implements OnInit {
     private suggestSongsPopularAutoPlayStart(): void {
 
         if (this.suggestSongsPopularFoundPlayInterval) {
-            window.clearInterval(this.suggestSongsPopularFoundPlayInterval);
+            this.suggestSongsPopularFoundPlayInterval.unsubscribe();
+            this.suggestSongsPopularFoundPlayInterval = null;
         }
 
-        this.suggestSongsPopularFoundPlayInterval = window.setInterval(() => {
+        this.suggestSongsPopularFoundPlayInterval = interval(this.appConfig.suggestListIntervalMs)
+            .pipe(
+                takeUntil(this.unsubscribe$)
+            )
+            .subscribe(() => {
 
             if (this.suggestSongsPopularDataFilter.offset + this.appConfig.suggestListRowsLimit >= this.appConfig.suggestSongsPopularResetLimit) {
                 this.suggestSongsPopularDataFilter.offset = 0;
@@ -525,12 +557,14 @@ export class SbConcertContainerComponent implements OnInit {
                     this.suggestSongsPopularFoundSongsResult = result;
                 });
 
-        }, this.appConfig.suggestListIntervalMs);
+        });
     }
 
     private suggestSongsPopularAutoPlayStop(): void {
-        window.clearInterval(this.suggestSongsPopularFoundPlayInterval);
-        this.suggestSongsPopularFoundPlayInterval = null;
+        if (this.suggestSongsPopularFoundPlayInterval) {
+            this.suggestSongsPopularFoundPlayInterval.unsubscribe();
+            this.suggestSongsPopularFoundPlayInterval = null;
+        }
     }
 
     private fetchConcert(id: number): void {
@@ -580,6 +614,4 @@ export class SbConcertContainerComponent implements OnInit {
         dataFilter.where = this.songRepository.createDataFilterWhere();
         return dataFilter;
     }
-
-
 }

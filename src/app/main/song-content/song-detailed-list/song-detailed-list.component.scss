@@ -1,0 +1,32 @@
+@import 'src/styles/mixins';
+@import 'src/styles/variables';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+
+    .header-container {
+        .song-code {
+            margin-left: 8px;
+            color: $sb-secondary-text-color;
+        }
+    }
+
+    .content-container {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        li {
+            display: flex;
+            @include sb-custom-control();
+            background: $sb-item-bg-color;
+            border-radius: $sb-item-border-radius;
+
+            &.selected {
+                background: $sb-item-selected-bg-color;
+            }
+        }
+    }
+}

@@ -17,13 +17,13 @@ import { SbSongViewComponent } from './song-view/song-view.component';
 import { SbSongContainerComponent } from './song-container.component';
 import { SbSongContentListVideoComponent } from './song-content-list-video/song-content-list-video.component';
 import { SbSongContentListFilesComponent } from './song-content-list/song-content-list-files.component';
-import { SongContentVideoFrameDirective } from './song-content-list-video/song-content-video-frame.directive';
 import { SbSongContentVideoAddComponent } from './song-content-add-video/song-content-video-add.component';
 import {SbUiUtilsModule} from '../../shared/modules/ui-utils/ui-utils.module';
 import {SongListModule} from '../../shared/modules/song-list/song-list.module';
 import {SongTextSearchModule} from '../../shared/modules/song-text-search/song-text-search.module';
 import {SongTagListModule} from '../../shared/modules/song-tag-list/song-tag-list.module';
-import {SongHeaderModule} from '../../shared/modules/song-header/song-header.module';
+import {SbSongHeaderModule} from '../../shared/modules/song-header/song-header.module';
+import {SbSongContentItemsModule} from '../../shared/modules/song-content/song-content-items.module';
 
 @NgModule({
     declarations: [
@@ -31,7 +31,6 @@ import {SongHeaderModule} from '../../shared/modules/song-header/song-header.mod
         SbSongViewComponent,
         SbSongContentListVideoComponent,
         SbSongContentListFilesComponent,
-        SongContentVideoFrameDirective,
         SbSongContentVideoAddComponent,
     ],
     imports     : [
@@ -49,9 +48,10 @@ import {SongHeaderModule} from '../../shared/modules/song-header/song-header.mod
         MatButtonModule,
         SbUiUtilsModule,
         SongListModule,
-        SongHeaderModule,
+        SbSongHeaderModule,
         SongTextSearchModule,
-        SongTagListModule
+        SongTagListModule,
+        SbSongContentItemsModule
     ]
 })
 

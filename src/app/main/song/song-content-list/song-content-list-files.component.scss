@@ -1,24 +1,8 @@
 :host {
-    .icon {
-        width: 42px;
-        height: 42px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 90%;
-    }
 
     mat-table {
         .col-name {
             max-width: 300px;
-        }
-
-        mat-cell {
-            &.col-name {
-                a {
-                    display: flex;
-                    align-items: center;
-                }
-            }
         }
     }
 }

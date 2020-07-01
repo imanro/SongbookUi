@@ -1,0 +1,5 @@
+<sb-song-content-gdrive-file [item]="item" *ngIf="item.type === contentTypeEnum.GDRIVE_CLOUD_FILE; else otherTypes"></sb-song-content-gdrive-file>
+<ng-template #otherTypes>
+    <iframe sbSongContentVideoFrame [url]="item.content" [width]="'500'" *ngIf="isContentVideo"></iframe>
+</ng-template>
+

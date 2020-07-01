@@ -18,6 +18,16 @@ const appRoutes: Routes = [
         component: SbFullLayoutComponent,
         loadChildren: './main/concert/concert.module#SbConcertModule'
     },
+    {
+        path: 'song-content',
+        component: SbFullLayoutComponent,
+        loadChildren: './main/song-content/song-content.module#SbSongContentModule'
+    },
+    {
+        path: 'share',
+        component: SbFullLayoutComponent,
+        loadChildren: './main/share/share.module#SbShareModule'
+    },
 
 ];
 

@@ -3,7 +3,7 @@
 
 %item {
     display: flex; // because of unequal space using "fxFlex"
-    border-radius: 4px;
+    border-radius: $sb-item-border-radius;
     background: $sb-item-bg-color;
 
     &.selected {
